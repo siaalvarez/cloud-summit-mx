@@ -1,0 +1,37 @@
+{
+  "name": "summit-mx-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Frontend interactivo para la suite de Agentes de IA del Google Cloud Summit México (Retail, Logística y Fintech).",
+  "scripts": {
+    "dev": "vite --port 3000 --open",
+    "build": "vite build",
+    "preview": "vite preview --port 3000",
+    "serve": "http-server . -p 3000 -c-1 --proxy http://localhost:8080",
+    "start": "vite"
+  },
+  "dependencies": {
+    "@mdi/font": "^7.4.47",
+    "axios": "^1.7.9",
+    "chart.js": "^4.4.8",
+    "leaflet": "^1.9.4",
+    "marked": "^15.0.7",
+    "roboto-fontface": "^0.10.0",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0",
+    "vuetify": "^3.7.11"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "vite": "^6.2.0"
+  },
+  "keywords": [
+    "google-cloud",
+    "gemini",
+    "vue3",
+    "vuetify",
+    "agents"
+  ],
+  "author": "Google Cloud Summit México",
+  "license": "UNLICENSED"
+}
