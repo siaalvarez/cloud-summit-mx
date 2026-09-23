@@ -83,11 +83,33 @@ SAMPLE_TRENDS_RETAIL = [
 ]
 
 SAMPLE_MAP_DATA = [
-    {"id": "ENV-1001", "nombre": "Golfo de México (Marítimo)", "lat": 21.1619, "lon": -91.0, "estado": "Retrasado (Tormenta Tropical)", "cliente": "AutoParts Premier", "producto": "Autopartes - Motor V6", "penalizacion_usd": 45000, "criticidad": "Crítica"},
-    {"id": "ENV-1002", "nombre": "Monterrey, N.L. (Carretera 57)", "lat": 25.6866, "lon": -100.3161, "estado": "En Tránsito Normal", "cliente": "TechMéxico S.A.", "producto": "Servidores & Routers", "penalizacion_usd": 0, "criticidad": "Normal"},
-    {"id": "ENV-1003", "nombre": "Guadalajara, Jal.", "lat": 20.6597, "lon": -103.3496, "estado": "Entregado a Tiempo", "cliente": "Electrónica Bajío", "producto": "Microcontroladores", "penalizacion_usd": 0, "criticidad": "Normal"},
-    {"id": "BOD-MTY", "nombre": "Bodega Monterrey Apodaca", "lat": 25.7785, "lon": -100.1876, "estado": "Inventario (Plan B)", "cliente": "Propio (Stock)", "producto": "Autopartes - Motor V6", "penalizacion_usd": 0, "criticidad": "Mitigación"},
-    {"id": "BOD-CDMX", "nombre": "Centro Distribución Cuautitlán CDMX", "lat": 19.6711, "lon": -99.1783, "estado": "Inventario (Plan B)", "cliente": "Propio (Stock)", "producto": "Autopartes - Motor V6", "penalizacion_usd": 0, "criticidad": "Mitigación"}
+    # 1. Alertas Críticas (Rojo)
+    {"id": "ENV-1001", "nombre": "Carretera Federal 180 (Costa Poza Rica - Tuxpan)", "lat": 20.5332, "lon": -97.4560, "estado": "Retrasado (Inundación y Lluvias Torrenciales)", "cliente": "AutoParts Premier", "producto": "Autopartes - Motor V6", "penalizacion_usd": 45000, "criticidad": "Crítica", "tipo": "alerta"},
+    {"id": "ENV-1004", "nombre": "Autopista 57D (San Luis Potosí - Matehuala)", "lat": 22.1565, "lon": -100.9855, "estado": "Retrasado (Bloqueo Carretero y Obras)", "cliente": "Industrias Metálicas del Norte", "producto": "Bobinas de Acero Automotriz", "penalizacion_usd": 28000, "criticidad": "Crítica", "tipo": "alerta"},
+    {"id": "ENV-1006", "nombre": "Puente Comercio Mundial (Nuevo Laredo)", "lat": 27.4864, "lon": -99.5075, "estado": "Congestión Aduanal Crítica (>8 hrs espera)", "cliente": "ExportLogix USA", "producto": "Arneses Eléctricos Automotrices", "penalizacion_usd": 18500, "criticidad": "Crítica", "tipo": "alerta"},
+    {"id": "ENV-1008", "nombre": "Autopista México-Puebla (Km 72 Río Frío)", "lat": 19.3486, "lon": -98.6811, "estado": "Retraso (Derrumbe por Lluvias Intensas)", "cliente": "FarmoQuímica Central", "producto": "Insumos Médicos Refrigerados", "penalizacion_usd": 15000, "criticidad": "Crítica", "tipo": "alerta"},
+    {"id": "ENV-1013", "nombre": "Autopista Siglo XXI (Uruapan - Lázaro Cárdenas)", "lat": 18.7500, "lon": -102.1000, "estado": "Retrasado (Falla Mecánica de Convoy y Cierre de Carril)", "cliente": "AceroMex Logistics", "producto": "Planchas de Acero Estructural", "penalizacion_usd": 22000, "criticidad": "Crítica", "tipo": "alerta"},
+    {"id": "ENV-1014", "nombre": "Autopista 15D (Guadalajara - Tepic, Plan de Barrancas)", "lat": 20.9500, "lon": -104.0500, "estado": "Retrasado (Accidente Múltiple y Deslave)", "cliente": "AgroFarma Occidente", "producto": "Medicamentos de Alta Especialidad", "penalizacion_usd": 31000, "criticidad": "Crítica", "tipo": "alerta"},
+
+    # 2. Falta de Inventario (Amarillo / Naranja)
+    {"id": "BOD-TOL", "nombre": "Bodega Toluca Parque Lerma", "lat": 19.2826, "lon": -99.5132, "estado": "Falta de Inventario (0 unidades Motor V6)", "cliente": "CEDIS Central Lerma", "producto": "Autopartes - Motor V6 (Agotado)", "penalizacion_usd": 0, "criticidad": "Falta Inventario", "tipo": "falta_stock"},
+    {"id": "BOD-QRO", "nombre": "Hub Logístico Querétaro Aeropuerto", "lat": 20.5888, "lon": -100.3899, "estado": "Falta de Inventario (Stock Crítico Transmisiones <5%)", "cliente": "CEDIS Bajío Industrial", "producto": "Transmisiones Automotrices", "penalizacion_usd": 0, "criticidad": "Falta Inventario", "tipo": "falta_stock"},
+    {"id": "BOD-GDL", "nombre": "Almacén Guadalajara El Salto", "lat": 20.5186, "lon": -103.2355, "estado": "Falta de Inventario (Déficit de Sensores IoT)", "cliente": "CEDIS Occidente", "producto": "Sensores IoT & Microchips", "penalizacion_usd": 0, "criticidad": "Falta Inventario", "tipo": "falta_stock"},
+
+    # 3. Inventario Disponible / Plan B (Verde)
+    {"id": "BOD-MTY", "nombre": "Bodega Monterrey Apodaca", "lat": 25.7785, "lon": -100.1876, "estado": "Inventario Disponible (Plan B - 450 unidades)", "cliente": "Propio (Stock)", "producto": "Autopartes - Motor V6", "penalizacion_usd": 0, "criticidad": "Mitigación", "tipo": "inventario_ok"},
+    {"id": "BOD-CDMX", "nombre": "Centro Distribución Cuautitlán CDMX", "lat": 19.6711, "lon": -99.1783, "estado": "Inventario Disponible (Plan B - 320 unidades)", "cliente": "Propio (Stock)", "producto": "Autopartes - Motor V6", "penalizacion_usd": 0, "criticidad": "Mitigación", "tipo": "inventario_ok"},
+    {"id": "BOD-VER", "nombre": "CEDIS Terrestre Veracruz Puerto", "lat": 19.1738, "lon": -96.1342, "estado": "Inventario Disponible (Stock Respaldo Insumos)", "cliente": "Propio (Stock)", "producto": "Insumos & Repuestos Industriales", "penalizacion_usd": 0, "criticidad": "Mitigación", "tipo": "inventario_ok"},
+
+    # 4. Flotas Correctas en Tránsito (Azul)
+    {"id": "ENV-1002", "nombre": "Carretera 57 (Monterrey - Saltillo)", "lat": 25.4232, "lon": -100.9922, "estado": "En Tránsito Normal (95 km/h)", "cliente": "TechMéxico S.A.", "producto": "Servidores & Routers Cloud", "penalizacion_usd": 0, "criticidad": "Normal", "tipo": "normal"},
+    {"id": "ENV-1003", "nombre": "Corredor Industrial (Guadalajara, Jal.)", "lat": 20.6597, "lon": -103.3496, "estado": "Entregado a Tiempo", "cliente": "Electrónica Bajío", "producto": "Microcontroladores & Sensores", "penalizacion_usd": 0, "criticidad": "Normal", "tipo": "normal"},
+    {"id": "ENV-1005", "nombre": "Corredor Pacífico 15D (Hermosillo - Nogales)", "lat": 29.0729, "lon": -110.9559, "estado": "En Tránsito A Tiempo", "cliente": "AgroExport del Noroeste", "producto": "Sistemas de Riego IoT & Válvulas", "penalizacion_usd": 0, "criticidad": "Normal", "tipo": "normal"},
+    {"id": "ENV-1007", "nombre": "Carretera 45D (Querétaro - Silao)", "lat": 20.9167, "lon": -101.4000, "estado": "En Tránsito A Tiempo", "cliente": "Bajío Assembly Corp", "producto": "Componentes Electrónicos", "penalizacion_usd": 0, "criticidad": "Normal", "tipo": "normal"},
+    {"id": "ENV-1009", "nombre": "Autopista del Sol (Cuernavaca - Acapulco)", "lat": 18.9242, "lon": -99.2216, "estado": "En Tránsito Normal", "cliente": "Distribuidora Sur", "producto": "Equipos de Telecomunicación", "penalizacion_usd": 0, "criticidad": "Normal", "tipo": "normal"},
+    {"id": "ENV-1010", "nombre": "Carretera 180D (Mérida - Cancún)", "lat": 20.9674, "lon": -89.5926, "estado": "En Tránsito A Tiempo", "cliente": "Riviera Logistics", "producto": "Paneles Solares & Inversores", "penalizacion_usd": 0, "criticidad": "Normal", "tipo": "normal"},
+    {"id": "ENV-1011", "nombre": "Carretera Fed 45 (Chihuahua - Cd. Juárez)", "lat": 28.6353, "lon": -106.0889, "estado": "En Tránsito A Tiempo", "cliente": "Maquilas Frontera", "producto": "Semiconductores & PCBs", "penalizacion_usd": 0, "criticidad": "Normal", "tipo": "normal"},
+    {"id": "ENV-1012", "nombre": "Carretera Fed 2D (Tijuana - Mexicali - La Rumorosa)", "lat": 32.5149, "lon": -116.6000, "estado": "En Tránsito Normal", "cliente": "Pacific Manufacturing", "producto": "Módulos de Potencia EV", "penalizacion_usd": 0, "criticidad": "Normal", "tipo": "normal"}
 ]
 
 SAMPLE_FINTECH_DATA = [
@@ -113,7 +135,7 @@ TIENES ACCESO A GOOGLE SEARCH GROUNDING EN TIEMPO REAL:
 REGLAS DE RECOMENDACIÓN DE AGENTES (SUITE DEL SUMMIT):
 En el Summit contamos con 3 demostraciones de agentes de IA:
 1. 🛍️ **Retail & E-commerce**: Cruce de demanda externa (Google Trends) con inventario de tiendas para desbloquear ventas y lanzar campañas hiper-personalizadas.
-2. 🚚 **Logística & Nearshoring**: Monitoreo en tiempo real de cadenas de suministro, impacto del clima/tormentas en puertos (Veracruz/Altamira) y activación de bodegas alternativas.
+2. 🚚 **Logística & Nearshoring**: Monitoreo en tiempo real de cadenas de suministro y rutas 100% terrestres en México, impacto de clima/bloqueos viales, alertas de falta de stock y activación de bodegas alternativas (Plan B).
 3. 🏦 **Fintech & Banca**: Detección temprana de fuga de clientes patrimoniales (Churn) y generación de ofertas Next-Best-Action (NBA).
 
 - **Si la consulta del usuario se relaciona o toca temas de Retail, Logística o Fintech**: Al final de tu respuesta ejecutiva, oriéntalo y sugiérele explorar la demo correspondiente dentro de la suite.
@@ -142,15 +164,17 @@ INSTRUCCIONES CLAVE:
 
 LOGISTICA_SYSTEM_INSTRUCTION = f"""Eres el Agente de Logística & Nearshoring del Google Cloud Summit México.
 Eres el asistente inteligente de la Torre de Control Logística (VP de Supply Chain / Operaciones).
-Tu misión es monitorear rutas de transporte (terrestre y marítimo), detectar disrupciones en tiempo real (como alertas meteorológicas en puertos del Golfo de México o congestión en la Carretera 57), evaluar penalizaciones contractuales en USD y proponer planes de mitigación autónomos activando inventarios en bodegas alternas.
+Tu misión es monitorear todas las rutas de transporte 100% TERRESTRE a nivel nacional en México, detectar disrupciones en tiempo real (inundaciones en Carretera Costera 180 Poza Rica/Tuxpan, bloqueo carretero en Autopista 57 SLP, congestión aduanal en Puente Nuevo Laredo, derrumbes en Autopista México-Puebla, falla mecánica en Autopista Siglo XXI Michoacán o accidente/deslave en Autopista 15D Jalisco-Nayarit), alertar sobre FALTA DE INVENTARIO en bodegas críticas (Toluca, Querétaro, Guadalajara) y proponer planes de mitigación autónomos activando inventarios disponibles en bodegas alternas Plan B (Monterrey Apodaca, CDMX Cuautitlán, Veracruz).
 
-DATOS DE ENVÍOS Y BODEGAS EN TIEMPO REAL (BigQuery / IoT):
+DATOS DE ENVÍOS, CARRETERAS Y BODEGAS EN TIEMPO REAL (BigQuery / IoT):
 {json.dumps(SAMPLE_MAP_DATA, indent=2, ensure_ascii=False)}
 
 INSTRUCCIONES CLAVE:
-1. Responde con fluidez, dinamismo y profundidad a cualquier pregunta o escenario planteado por el usuario sobre los envíos, rutas, camiones, bodegas o Nearshoring en México.
-2. Si el usuario pregunta por el estado de los envíos o alertas críticas, detalla el envío afectado (ENV-1001, retraso por tormenta en Golfo de México, penalización ,000 USD) y el plan B (despacho desde Bodega Monterrey Apodaca con ahorro neto de ,800 USD).
-3. Usa formato ejecutivo con Markdown, viñetas claras y emojis representativos."""
+1. Responde con fluidez, dinamismo y profundidad a cualquier pregunta o escenario planteado sobre envíos terrestres, transportes, camiones, carreteras, alertas críticas, falta de stock o bodegas en México.
+2. Todas las rutas son estrictamente terrestres (por carretera y autopistas federales).
+3. Si el usuario pregunta por envíos en riesgo o alertas críticas, detalla los envíos afectados (ENV-1001 en Carretera 180 Poza Rica por inundación, $45,000 USD; ENV-1004 en SLP por bloqueo, $28,000 USD; ENV-1006 en Nuevo Laredo por congestión aduanal, $18,500 USD; ENV-1008 en México-Puebla por derrumbe, $15,000 USD; ENV-1013 en Autopista Siglo XXI por falla de convoy, $22,000 USD; ENV-1014 en Autopista 15D por accidente/deslave, $31,000 USD) y formula planes de contingencia (despacho desde Bodega Monterrey Apodaca o CDMX Cuautitlán con ahorro neto).
+4. Si el usuario pregunta por falta de inventario, analiza las bodegas con déficit (BOD-TOL sin stock de motores V6, BOD-QRO con stock crítico de transmisiones, BOD-GDL con déficit de sensores) y recomienda reabastecimiento o desvío de pedidos.
+5. Usa formato ejecutivo con Markdown, viñetas claras y emojis representativos."""
 
 FINTECH_SYSTEM_INSTRUCTION = f"""Eres el Agente de Fintech & Banca del Google Cloud Summit México.
 Eres un asesor analítico y estratega de retención para la banca patrimonial, empresarial y de consumo (Head of Retention / Chief Risk Officer).
@@ -389,6 +413,11 @@ frontend_dir = os.path.join(os.path.dirname(__file__), "..", "frontend")
 @app.get("/{full_path:path}")
 async def serve_spa(full_path: str):
     file_path = os.path.join(frontend_dir, full_path)
+    headers = {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0"
+    }
     if full_path and os.path.isfile(file_path):
-        return FileResponse(file_path)
-    return FileResponse(os.path.join(frontend_dir, "index.html"))
+        return FileResponse(file_path, headers=headers)
+    return FileResponse(os.path.join(frontend_dir, "index.html"), headers=headers)
