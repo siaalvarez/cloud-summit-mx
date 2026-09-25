@@ -2,12 +2,12 @@
 
 const LogisticaView = {
   template: `
-    <v-container class="fill-height py-3 px-4" style="max-width: 1440px;">
-      <v-row class="fill-height my-0">
+    <v-container class="pa-2 px-3 flex-grow-1 d-flex flex-column fill-height" style="max-width: 100%; box-sizing: border-box; overflow: hidden;">
+      <v-row class="flex-grow-1 my-0" style="height: 100%; max-height: 100%; min-height: 0;">
         <!-- Lado Izquierdo: Mapa de Control Logístico -->
-        <v-col cols="12" md="7" class="d-flex flex-column">
-          <v-card elevation="2" class="rounded-xl flex-grow-1 d-flex flex-column overflow-hidden" style="min-height: 520px;">
-            <v-card-title class="bg-white pa-3 border-b d-flex align-center justify-space-between flex-wrap" style="border-bottom: 1px solid #e8eaed; gap: 8px;">
+        <v-col cols="12" md="7" class="d-flex flex-column pa-2" style="height: 100%; max-height: 100%; min-height: 0;">
+          <v-card elevation="2" class="rounded-xl flex-grow-1 d-flex flex-column overflow-hidden bg-white" style="height: 100%; max-height: 100%; min-height: 0;">
+            <v-card-title class="bg-white pa-3 border-b d-flex align-center justify-space-between flex-wrap flex-shrink-0" style="border-bottom: 1px solid #e8eaed; gap: 8px;">
               <div class="d-flex align-center">
                 <v-avatar color="#e8f0fe" size="36" class="mr-3">
                   <v-icon color="#4285F4">mdi-map-marker-path</v-icon>
@@ -28,21 +28,21 @@ const LogisticaView = {
                 </v-chip>
               </div>
             </v-card-title>
-            <v-card-text class="flex-grow-1 pa-0 position-relative" style="min-height: 460px;">
+            <v-card-text class="flex-grow-1 pa-0 position-relative" style="min-height: 0; height: 100%;">
               <div v-if="selectedRouteName" class="position-absolute" style="top: 12px; right: 12px; z-index: 999;">
                 <v-chip color="white" elevation="3" size="small" closable @click:close="clearActiveRoute" class="font-weight-bold" style="color: #202124;">
                   <v-icon start size="14" color="#4285F4">mdi-road-variant</v-icon> Ruta activa: {{ selectedRouteName }}
                 </v-chip>
               </div>
-              <div id="mapContainer" style="width: 100%; height: 100%; min-height: 460px; z-index: 1;"></div>
+              <div id="mapContainer" style="width: 100%; height: 100%; min-height: 100%; z-index: 1;"></div>
             </v-card-text>
           </v-card>
         </v-col>
 
         <!-- Lado Derecho: Chatbot de Logística -->
-        <v-col cols="12" md="5" class="d-flex flex-column">
-          <v-card elevation="2" class="rounded-xl flex-grow-1 d-flex flex-column bg-grey-lighten-4" style="min-height: 520px;">
-            <v-card-title class="bg-white pa-3 font-weight-bold d-flex align-center justify-space-between" style="color: #202124; border-bottom: 1px solid #eee;">
+        <v-col cols="12" md="5" class="d-flex flex-column pa-2" style="height: 100%; max-height: 100%; min-height: 0;">
+          <v-card elevation="2" class="rounded-xl flex-grow-1 d-flex flex-column bg-grey-lighten-4 overflow-hidden" style="height: 100%; max-height: 100%; min-height: 0;">
+            <v-card-title class="bg-white pa-3 font-weight-bold d-flex align-center justify-space-between flex-shrink-0" style="color: #202124; border-bottom: 1px solid #eee;">
               <div class="d-flex align-center">
                 <v-icon color="#4285F4" class="mr-2">mdi-robot-outline</v-icon>
                 Agente de Logística
@@ -51,7 +51,7 @@ const LogisticaView = {
             </v-card-title>
 
             <!-- Quick Prompts -->
-            <div class="px-3 py-2 bg-white d-flex flex-wrap" style="gap: 6px; border-bottom: 1px solid #f0f0f0;">
+            <div class="px-3 py-2 bg-white d-flex flex-wrap flex-shrink-0" style="gap: 6px; border-bottom: 1px solid #f0f0f0;">
               <v-chip size="x-small" variant="tonal" color="#EA4335" class="cursor-pointer font-weight-bold" @click="askLogisticaPrompt('🚨 ¿Cuáles son los envíos terrestres con alerta crítica y cómo mitigarlos?')">
                 🚨 Envíos en riesgo
               </v-chip>
@@ -67,21 +67,21 @@ const LogisticaView = {
             </div>
 
             <!-- Mensajes -->
-            <v-card-text class="chat-container flex-grow-1 pa-4" id="chat-box">
-              <div v-for="(msg, index) in messages" :key="index">
+            <v-card-text class="chat-container flex-grow-1 pa-3 overflow-y-auto custom-scrollbar" id="chat-box" style="min-height: 0; flex: 1 1 0; background-color: #f8f9fa;">
+              <div v-for="(msg, index) in messages" :key="index" style="clear: both; width: 100%;">
                 <div :class="msg.role === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai'" :style="msg.role === 'ai' ? 'border-left: 4px solid #4285F4;' : ''">
                   <div v-if="msg.role === 'ai'" v-html="formatResponse(msg.content)"></div>
                   <div v-else>{{ msg.content }}</div>
                 </div>
               </div>
-              <div v-if="loading" class="chat-bubble-ai" style="border-left: 4px solid #4285F4;">
+              <div v-if="loading" class="chat-bubble-ai" style="border-left: 4px solid #4285F4; clear: both;">
                 <v-progress-circular indeterminate color="#4285F4" size="18" class="mr-2"></v-progress-circular>
                 Consultando BigQuery & Modelos de Tránsito Terrestre...
               </div>
             </v-card-text>
 
             <!-- Input -->
-            <v-card-actions class="pa-3 bg-white">
+            <v-card-actions class="pa-3 bg-white flex-shrink-0" style="border-top: 1px solid #eee;">
               <v-text-field
                 v-model="userInput"
                 variant="outlined"
@@ -132,6 +132,9 @@ const LogisticaView = {
   mounted() {
     this.$nextTick(() => {
       this.initMap();
+      setTimeout(() => {
+        if (this.map) this.map.invalidateSize();
+      }, 250);
       if (this.$route.query.prompt) {
         this.userInput = this.$route.query.prompt;
         setTimeout(() => this.sendMessage(), 300);

@@ -110,12 +110,17 @@
     }
     #app, .v-application, .v-application__wrap {
       background-color: #f8f9fa !important;
-      min-height: 100vh;
+      height: 100vh;
+      max-height: 100vh;
+      overflow: hidden;
     }
     .v-main {
       background-color: #f8f9fa !important;
-      padding-bottom: 20px !important;
+      padding-bottom: 0px !important;
       box-sizing: border-box;
+      height: calc(100vh - 64px);
+      max-height: calc(100vh - 64px);
+      overflow-y: auto;
     }
     .custom-scrollbar::-webkit-scrollbar {
       width: 6px;
@@ -310,7 +315,7 @@
       <!-- ============================================== -->
       <!-- CONTENIDO PRINCIPAL: ROUTER VIEW DINÁMICO      -->
       <!-- ============================================== -->
-      <v-main class="d-flex flex-column bg-grey-lighten-4" style="background-color: #f8f9fa; min-height: 100vh; overflow-y: auto; padding-bottom: 20px;">
+      <v-main class="d-flex flex-column bg-grey-lighten-4" style="background-color: #f8f9fa; height: calc(100vh - 64px); max-height: calc(100vh - 64px); overflow-y: auto; padding-bottom: 0px;">
         <router-view></router-view>
       </v-main>
     </v-app>
@@ -325,13 +330,13 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Vistas Modulares de los Agentes -->
-  <script src="/views/HomeView.js?v=2.9"></script>
-  <script src="/views/LogisticaView.js?v=2.9"></script>
-  <script src="/views/RetailView.js?v=2.9"></script>
-  <script src="/views/FintechView.js?v=2.9"></script>
+  <script src="/views/HomeView.js?v=3.0"></script>
+  <script src="/views/LogisticaView.js?v=3.0"></script>
+  <script src="/views/RetailView.js?v=3.0"></script>
+  <script src="/views/FintechView.js?v=3.0"></script>
 
   <!-- Configuración de Rutas y Montaje de la Aplicación -->
-  <script src="/router.js?v=2.9"></script>
-  <script src="/main.js?v=2.9"></script>
+  <script src="/router.js?v=3.0"></script>
+  <script src="/main.js?v=3.0"></script>
 </body>
 </html>
