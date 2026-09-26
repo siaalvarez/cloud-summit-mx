@@ -1,72 +1,264 @@
-// LogisticaView.js - Vista de Logística & Nearshoring (Torre de Control Terrestre y Copiloto)
+// LogisticaView.js - Vista de Logística & Nearshoring (Torre de Control Terrestre & Copiloto Inteligente)
 
 const LogisticaView = {
   template: `
     <v-container class="pa-2 px-3 flex-grow-1 d-flex flex-column fill-height" style="max-width: 100%; box-sizing: border-box; overflow: hidden;">
       <v-row class="flex-grow-1 my-0" style="height: 100%; max-height: 100%; min-height: 0;">
-        <!-- Lado Izquierdo: Mapa de Control Logístico -->
+        
+        <!-- ========================================== -->
+        <!-- LADO IZQUIERDO: MAPA DE CONTROL LOGÍSTICO  -->
+        <!-- ========================================== -->
         <v-col cols="12" md="7" class="d-flex flex-column pa-2" style="height: 100%; max-height: 100%; min-height: 0;">
-          <v-card elevation="2" class="rounded-xl flex-grow-1 d-flex flex-column overflow-hidden bg-white" style="height: 100%; max-height: 100%; min-height: 0;">
+          <v-card elevation="2" class="rounded-xl flex-grow-1 d-flex flex-column overflow-hidden bg-white position-relative" style="height: 100%; max-height: 100%; min-height: 0;">
+            
+            <!-- Header Superior del Mapa con Estadísticas en Tiempo Real -->
             <v-card-title class="bg-white pa-3 border-b d-flex align-center justify-space-between flex-wrap flex-shrink-0" style="border-bottom: 1px solid #e8eaed; gap: 8px;">
               <div class="d-flex align-center">
                 <v-avatar color="#e8f0fe" size="36" class="mr-3">
-                  <v-icon color="#4285F4">mdi-map-marker-path</v-icon>
+                  <v-icon color="#4285F4">mdi-truck-delivery-outline</v-icon>
                 </v-avatar>
                 <div>
-                  <div class="text-subtitle-2 font-weight-bold" style="color: #202124;">Torre de Control: Envíos & Logística Terrestre</div>
+                  <div class="text-subtitle-2 font-weight-bold" style="color: #202124;">Torre de Control: Corredores & Flotas Terrestres</div>
+                  <div class="text-caption text-grey-darken-1" style="font-size: 11px;">Red Nacional: CEDIS Orígenes ➔ Corredores ➔ Hubs Destino</div>
                 </div>
               </div>
-              <div class="d-flex align-center" style="gap: 6px;">
+              <div class="d-flex align-center flex-wrap" style="gap: 6px;">
                 <v-chip color="error" size="small" variant="flat" class="font-weight-bold">
-                  <v-icon start size="14">mdi-alert-octagon</v-icon> {{ alertCount }} Alertas Críticas
+                  <v-icon start size="14">mdi-alert-octagon</v-icon> {{ disruptedRoutesCount }} Rutas Afectadas
                 </v-chip>
                 <v-chip color="#FBBC05" size="small" variant="flat" class="font-weight-bold" style="color: #202124 !important;">
-                  <v-icon start size="14">mdi-package-variant-remove</v-icon> {{ faltaInvCount }} Falta Stock
+                  <v-icon start size="14">mdi-truck-alert</v-icon> {{ affectedVehiclesCount }} Transportes Detenidos
                 </v-chip>
-                <v-chip color="#4285F4" size="small" variant="tonal" class="font-weight-bold">
-                  <v-icon start size="14">mdi-truck-fast</v-icon> {{ normalCount }} Flotas OK
+                <v-chip color="#34A853" size="small" variant="flat" class="font-weight-bold text-white">
+                  <v-icon start size="14">mdi-warehouse</v-icon> {{ planBWarehousesCount }} Plan B Activo
                 </v-chip>
               </div>
             </v-card-title>
+
+            <!-- Barra de Filtros y Acciones Rápidas del Mapa -->
+            <div class="px-3 py-1 bg-grey-lighten-4 border-b d-flex align-center justify-space-between flex-wrap flex-shrink-0" style="border-bottom: 1px solid #f0f0f0; gap: 6px; font-size: 11.5px;">
+              <div class="d-flex align-center flex-wrap" style="gap: 4px;">
+                <span class="text-caption font-weight-bold text-grey-darken-2 mr-1">Filtrar:</span>
+                <v-btn
+                  size="x-small"
+                  rounded="pill"
+                  :variant="activeFilter === 'all' ? 'flat' : 'text'"
+                  :color="activeFilter === 'all' ? '#4285F4' : '#5f6368'"
+                  class="text-capitalize"
+                  :class="activeFilter === 'all' ? 'text-white' : ''"
+                  @click="setFilter('all')"
+                >
+                  Todos
+                </v-btn>
+                <v-btn
+                  size="x-small"
+                  rounded="pill"
+                  :variant="activeFilter === 'disrupted' ? 'flat' : 'text'"
+                  :color="activeFilter === 'disrupted' ? '#EA4335' : '#5f6368'"
+                  class="text-capitalize"
+                  :class="activeFilter === 'disrupted' ? 'text-white' : ''"
+                  @click="setFilter('disrupted')"
+                >
+                  🚨 Solo Disrupciones
+                </v-btn>
+                <v-btn
+                  size="x-small"
+                  rounded="pill"
+                  :variant="activeFilter === 'vehicles' ? 'flat' : 'text'"
+                  :color="activeFilter === 'vehicles' ? '#1967d2' : '#5f6368'"
+                  class="text-capitalize"
+                  :class="activeFilter === 'vehicles' ? 'text-white' : ''"
+                  @click="setFilter('vehicles')"
+                >
+                  🚚 Flotas
+                </v-btn>
+                <v-btn
+                  size="x-small"
+                  rounded="pill"
+                  :variant="activeFilter === 'warehouses' ? 'flat' : 'text'"
+                  :color="activeFilter === 'warehouses' ? '#137333' : '#5f6368'"
+                  class="text-capitalize"
+                  :class="activeFilter === 'warehouses' ? 'text-white' : ''"
+                  @click="setFilter('warehouses')"
+                >
+                  📦 CEDIS / Hubs
+                </v-btn>
+              </div>
+
+              <div class="d-flex align-center" style="gap: 6px;">
+                <v-btn size="x-small" variant="text" color="#5f6368" @click="resetMapView">
+                  <v-icon start size="14">mdi-crosshairs-gps</v-icon> Centrar México
+                </v-btn>
+              </div>
+            </div>
+
+            <!-- Contenedor del Mapa Google Maps -->
             <v-card-text class="flex-grow-1 pa-0 position-relative" style="min-height: 0; height: 100%;">
-              <div v-if="selectedRouteName" class="position-absolute" style="top: 12px; right: 12px; z-index: 999;">
-                <v-chip color="white" elevation="3" size="small" closable @click:close="clearActiveRoute" class="font-weight-bold" style="color: #202124;">
-                  <v-icon start size="14" color="#4285F4">mdi-road-variant</v-icon> Ruta activa: {{ selectedRouteName }}
+              
+              <!-- Badge Flotante de Ruta Activa -->
+              <div v-if="selectedRoute" class="position-absolute" style="top: 12px; left: 12px; z-index: 999; max-width: 90%;">
+                <v-chip color="white" elevation="3" size="small" closable @click:close="clearActiveSelection" class="font-weight-bold" style="color: #202124; border: 1px solid #dadce0;">
+                  <v-icon start size="14" :color="selectedRoute.color">mdi-road-variant</v-icon>
+                  {{ selectedRoute.nombre }}
                 </v-chip>
               </div>
+
+              <!-- Banner / Notificación de Re-enrutamiento Aplicado -->
+              <v-fade-transition>
+                <div v-if="rerouteSuccessMessage" class="position-absolute" style="top: 12px; right: 12px; z-index: 1000;">
+                  <v-alert
+                    density="compact"
+                    type="success"
+                    variant="elevated"
+                    elevation="4"
+                    class="font-weight-bold text-caption rounded-lg"
+                    closable
+                    @click:close="rerouteSuccessMessage = ''"
+                  >
+                    {{ rerouteSuccessMessage }}
+                  </v-alert>
+                </div>
+              </v-fade-transition>
+
+              <!-- ============================================== -->
+              <!-- TARJETA FLOTANTE DE CONSIDERACIONES Y DESVÍO   -->
+              <!-- ============================================== -->
+              <v-slide-y-reverse-transition>
+                <div
+                  v-if="activeConsideration"
+                  class="position-absolute px-3 pb-3"
+                  style="bottom: 0px; left: 0px; right: 0px; z-index: 999; pointer-events: none;"
+                >
+                  <v-card
+                    elevation="8"
+                    class="rounded-xl pa-3 bg-white"
+                    style="border: 1.5px solid #34A853; pointer-events: auto; box-shadow: 0 8px 24px rgba(0,0,0,0.18) !important;"
+                  >
+                    <div class="d-flex align-center justify-space-between mb-2 pb-1 border-b">
+                      <div class="d-flex align-center">
+                        <v-avatar color="#e6f4ea" size="28" class="mr-2">
+                          <v-icon color="#34A853" size="18">mdi-routes</v-icon>
+                        </v-avatar>
+                        <div>
+                          <div class="text-caption font-weight-bold" style="color: #137333;">PROPUESTA DE DESVÍO ALTERNATIVO</div>
+                          <div class="text-subtitle-2 font-weight-bold" style="color: #202124;">
+                            {{ activeConsideration.alt_route_name || activeConsideration.nombre }}
+                          </div>
+                        </div>
+                      </div>
+                      <v-btn icon size="x-small" variant="text" @click="activeConsideration = null">
+                        <v-icon size="16">mdi-close</v-icon>
+                      </v-btn>
+                    </div>
+
+                    <!-- Métricas de Impacto y Comparativa -->
+                    <v-row dense class="my-1">
+                      <v-col cols="6" sm="3">
+                        <div class="pa-2 rounded-lg bg-grey-lighten-4 text-center">
+                          <div class="text-caption text-grey-darken-1" style="font-size: 10px;">Delta Tiempo</div>
+                          <div class="font-weight-bold text-caption" style="color: #1967d2;">
+                            {{ activeConsideration.consideraciones.delta_tiempo || '+1.2 hrs de tránsito' }}
+                          </div>
+                        </div>
+                      </v-col>
+                      <v-col cols="6" sm="3">
+                        <div class="pa-2 rounded-lg bg-grey-lighten-4 text-center">
+                          <div class="text-caption text-grey-darken-1" style="font-size: 10px;">Costo Extra (Diesel/Casetas)</div>
+                          <div class="font-weight-bold text-caption" style="color: #c5221f;">
+                            + {{ (activeConsideration.consideraciones.delta_combustible_usd || 0) + (activeConsideration.consideraciones.delta_peajes_usd || 0) || activeConsideration.consideraciones.delta_costo_usd || 93 }} USD
+                          </div>
+                        </div>
+                      </v-col>
+                      <v-col cols="6" sm="3">
+                        <div class="pa-2 rounded-lg bg-green-lighten-5 text-center">
+                          <div class="text-caption text-green-darken-3" style="font-size: 10px;">Ahorro Penalización SLA</div>
+                          <div class="font-weight-bold text-caption text-green-darken-3">
+                            {{ (activeConsideration.consideraciones.ahorro_penalizacion_usd || 28000).toLocaleString() }} USD
+                          </div>
+                        </div>
+                      </v-col>
+                      <v-col cols="6" sm="3">
+                        <div class="pa-2 rounded-lg bg-blue-lighten-5 text-center">
+                          <div class="text-caption text-blue-darken-3" style="font-size: 10px;">Ahorro Neto Empresa</div>
+                          <div class="font-weight-bold text-caption text-blue-darken-3">
+                            {{ (activeConsideration.consideraciones.ahorro_neto_usd || 27907).toLocaleString() }} USD
+                          </div>
+                        </div>
+                      </v-col>
+                    </v-row>
+
+                    <!-- Acciones de Aprobación -->
+                    <div class="d-flex align-center justify-space-between mt-2 pt-2 border-t" style="gap: 8px;">
+                      <div class="text-caption text-grey-darken-2" style="font-size: 11px;">
+                        <v-icon size="14" color="#34A853" class="mr-1">mdi-shield-check</v-icon>
+                        <b>Seguridad:</b> {{ activeConsideration.consideraciones.seguridad_vial || activeConsideration.consideraciones.seguridad || 'Alta (Vía de cuota satelital)' }}
+                      </div>
+                      <div class="d-flex align-center" style="gap: 6px;">
+                        <v-btn size="small" variant="text" color="grey-darken-2" class="text-capitalize" @click="activeConsideration = null">
+                          Descartar
+                        </v-btn>
+                        <v-btn
+                          size="small"
+                          color="#34A853"
+                          variant="flat"
+                          class="text-white text-capitalize font-weight-bold"
+                          @click="applyReroute(activeConsideration)"
+                          :loading="reroutingAnimation"
+                        >
+                          <v-icon start size="16">mdi-check-decagram</v-icon>
+                          Aprobar y Re-enrutar Flota
+                        </v-btn>
+                      </div>
+                    </div>
+                  </v-card>
+                </div>
+              </v-slide-y-reverse-transition>
+
+              <!-- Canvas del Mapa -->
               <div id="mapContainer" style="width: 100%; height: 100%; min-height: 100%; z-index: 1;"></div>
             </v-card-text>
           </v-card>
         </v-col>
 
-        <!-- Lado Derecho: Chatbot de Logística -->
+        <!-- ========================================== -->
+        <!-- LADO DERECHO: AGENTE CONVERSACIONAL       -->
+        <!-- ========================================== -->
         <v-col cols="12" md="5" class="d-flex flex-column pa-2" style="height: 100%; max-height: 100%; min-height: 0;">
           <v-card elevation="2" class="rounded-xl flex-grow-1 d-flex flex-column bg-grey-lighten-4 overflow-hidden" style="height: 100%; max-height: 100%; min-height: 0;">
+            
+            <!-- Título del Asistente -->
             <v-card-title class="bg-white pa-3 font-weight-bold d-flex align-center justify-space-between flex-shrink-0" style="color: #202124; border-bottom: 1px solid #eee;">
               <div class="d-flex align-center">
-                <v-icon color="#4285F4" class="mr-2">mdi-robot-outline</v-icon>
-                Agente de Logística
+                <v-avatar color="#e8f0fe" size="28" class="mr-2">
+                  <v-icon color="#4285F4" size="18">mdi-robot-outline</v-icon>
+                </v-avatar>
+                <div>
+                  <div style="font-size: 14px; line-height: 1.2;">Agente de Logística</div>
+                  <div class="text-caption text-grey" style="font-size: 10.5px;">Torre de Control • Rutas & Flotas en Tiempo Real</div>
+                </div>
               </div>
-              <v-chip size="x-small" color="primary" variant="outlined">BigQuery Connected</v-chip>
+              <v-chip size="x-small" color="primary" variant="outlined" class="font-weight-bold">
+                Google Maps Tooling
+              </v-chip>
             </v-card-title>
 
-            <!-- Quick Prompts -->
+            <!-- Quick Prompts / Sugerencias de Consultas -->
             <div class="px-3 py-2 bg-white d-flex flex-wrap flex-shrink-0" style="gap: 6px; border-bottom: 1px solid #f0f0f0;">
-              <v-chip size="x-small" variant="tonal" color="#EA4335" class="cursor-pointer font-weight-bold" @click="askLogisticaPrompt('🚨 ¿Cuáles son los envíos terrestres con alerta crítica y cómo mitigarlos?')">
-                🚨 Envíos en riesgo
+              <v-chip size="x-small" variant="tonal" color="#EA4335" class="cursor-pointer font-weight-bold" @click="askLogisticaPrompt('🚨 ¿Cuáles son los transportes afectados por disrupciones críticas en carreteras y cuál es el plan de desvío?')">
+                🚨 Envíos en Riesgo
               </v-chip>
-              <v-chip size="x-small" variant="tonal" color="#FBBC05" style="color: #9A6700 !important;" class="cursor-pointer font-weight-bold" @click="askLogisticaPrompt('⚠️ ¿Qué bodegas presentan falta de inventario y qué impacto tienen?')">
-                ⚠️ Falta de Stock
+              <v-chip size="x-small" variant="tonal" color="#34A853" class="cursor-pointer font-weight-bold" @click="askLogisticaPrompt('¿Qué bodegas con inventario Plan B (Monterrey, CDMX, Veracruz) podemos activar para mitigar las entregas demoradas?')">
+                📦 Stock Plan B
               </v-chip>
-              <v-chip size="x-small" variant="tonal" color="#34A853" class="cursor-pointer font-weight-bold" @click="askLogisticaPrompt('¿Qué bodegas con stock disponible Plan B podemos activar para despachar pedidos?')">
-                📦 Inventario Plan B
+              <v-chip size="x-small" variant="tonal" color="#FBBC05" style="color: #9A6700 !important;" class="cursor-pointer font-weight-bold" @click="askLogisticaPrompt('⚠️ ¿Qué hubs presentan falta de inventario (Toluca, Querétaro) y cómo reabastecerlos?')">
+                ⚠️ Déficit en Hubs
               </v-chip>
-              <v-chip size="x-small" variant="tonal" color="#4285F4" class="cursor-pointer font-weight-bold" @click="askLogisticaPrompt('¿Cuál es el estatus general de las flotas en tránsito terrestre nacional?')">
-                🚚 Flotas en Ruta
+              <v-chip size="x-small" variant="tonal" color="#4285F4" class="cursor-pointer font-weight-bold" @click="askLogisticaPrompt('¿Cuál es el estatus general de todas las flotas de transporte en tránsito nacional?')">
+                🚚 Flotas en Tránsito
               </v-chip>
             </div>
 
-            <!-- Mensajes -->
+            <!-- Contenedor del Chat -->
             <v-card-text class="chat-container flex-grow-1 pa-3 overflow-y-auto custom-scrollbar" id="chat-box" style="min-height: 0; flex: 1 1 0; background-color: #f8f9fa;">
               <div v-for="(msg, index) in messages" :key="index" style="clear: both; width: 100%;">
                 <div :class="msg.role === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai'" :style="msg.role === 'ai' ? 'border-left: 4px solid #4285F4;' : ''">
@@ -76,17 +268,17 @@ const LogisticaView = {
               </div>
               <div v-if="loading" class="chat-bubble-ai" style="border-left: 4px solid #4285F4; clear: both;">
                 <v-progress-circular indeterminate color="#4285F4" size="18" class="mr-2"></v-progress-circular>
-                Consultando BigQuery & Modelos de Tránsito Terrestre...
+                Analizando red logística y evaluando rutas alternas...
               </div>
             </v-card-text>
 
-            <!-- Input -->
+            <!-- Input de Preguntas -->
             <v-card-actions class="pa-3 bg-white flex-shrink-0" style="border-top: 1px solid #eee;">
               <v-text-field
                 v-model="userInput"
                 variant="outlined"
                 density="compact"
-                placeholder="Escribe una pregunta para el agente logístico..."
+                placeholder="Pregunta al agente sobre rutas, camiones, bloqueos o bodegas..."
                 hide-details
                 rounded="pill"
                 @keyup.enter="sendMessage"
@@ -110,23 +302,43 @@ const LogisticaView = {
       userInput: '',
       loading: false,
       messages: [
-        { role: 'ai', content: '¡Hola! Soy tu Agente de Logística. Estoy monitoreando en tiempo real las rutas de transporte terrestre nacional, niveles de inventario en bodegas y alertas viales en México. ¿En qué te puedo ayudar?' }
+        {
+          role: 'ai',
+          content: '¡Hola! Soy tu **Agente Inteligente de Logística y Control de Rutas Terrestres**. Estoy monitoreando en tiempo real la red nacional de transporte (CEDIS Orígenes, Corredores Carreteros, Hubs de Destino y Flotas en tránsito).\\n\\n¿Deseas evaluar el impacto de las disrupciones viales activas o analizar planes de re-enrutamiento para los transportes en riesgo?'
+        }
       ],
       map: null,
-      mapData: [],
-      activeRouteLayer: null,
-      selectedRouteName: ''
+      masterData: (typeof LOGISTICA_MASTER_DATA !== 'undefined') ? JSON.parse(JSON.stringify(LOGISTICA_MASTER_DATA)) : {
+        warehouses: [],
+        hubs: [],
+        routes: [],
+        vehicles: [],
+        alerts: []
+      },
+      activeFilter: 'all',
+      selectedRoute: null,
+      activeConsideration: null,
+      rerouteSuccessMessage: '',
+      reroutingAnimation: false,
+      
+      // Grupos de capas para gestión limpia en el mapa
+      routesLayerGroup: null,
+      altRoutesLayerGroup: null,
+      markersLayerGroup: null,
+      vehiclesLayerGroup: null,
+      alertsLayerGroup: null,
+      vehicleMarkers: {}
     };
   },
   computed: {
-    alertCount() {
-      return this.mapData.filter(i => i.criticidad === 'Crítica' || i.criticidad === 'Alerta' || i.tipo === 'alerta').length;
+    disruptedRoutesCount() {
+      return (this.masterData.routes || []).filter(r => r.estado === 'Disrumpida').length;
     },
-    faltaInvCount() {
-      return this.mapData.filter(i => i.criticidad === 'Falta Inventario' || i.tipo === 'falta_stock').length;
+    affectedVehiclesCount() {
+      return (this.masterData.vehicles || []).filter(v => v.estado_operativo === 'Afectado').length;
     },
-    normalCount() {
-      return this.mapData.filter(i => i.criticidad === 'Normal' || i.tipo === 'normal').length;
+    planBWarehousesCount() {
+      return (this.masterData.warehouses || []).filter(w => w.inventario_plan_b).length;
     }
   },
   mounted() {
@@ -155,453 +367,441 @@ const LogisticaView = {
         this.map.invalidateSize();
         return;
       }
-      
-      this.map = L.map('mapContainer').setView([23.6345, -102.5528], 5);
-      
+
+      // Inicializar mapa sin etiqueta ni atribución de Leaflet
+      this.map = L.map('mapContainer', {
+        attributionControl: false,
+        zoomControl: true,
+        renderer: L.svg({ padding: 0.5 })
+      }).setView([23.6345, -102.5528], 5);
+
+      // Capa de Google Maps oficial (limpia, nítida y rápida)
       L.tileLayer('https://mt0.google.com/vt/lyrs=m&hl=es&x={x}&y={y}&z={z}', {
-        attribution: '&copy; Google Maps',
         maxZoom: 20
       }).addTo(this.map);
 
-      // Limpiar ruta activa al hacer clic en el fondo del mapa
+      // Crear grupos de capas dedicados
+      this.routesLayerGroup = L.featureGroup().addTo(this.map);
+      this.altRoutesLayerGroup = L.featureGroup().addTo(this.map);
+      this.markersLayerGroup = L.featureGroup().addTo(this.map);
+      this.vehiclesLayerGroup = L.featureGroup().addTo(this.map);
+      this.alertsLayerGroup = L.featureGroup().addTo(this.map);
+
+      // Clic en fondo de mapa deselecciona
       this.map.on('click', (e) => {
-        if (e.originalEvent && (!e.originalEvent.target || !e.originalEvent.target.closest('.custom-leaflet-icon'))) {
-          this.clearActiveRoute();
+        if (e.originalEvent && !e.originalEvent.target.closest('.custom-map-marker')) {
+          this.clearActiveSelection();
         }
       });
 
-      this.loadMapData();
+      this.renderMasterTopology();
     },
-    getRouteData(item) {
-      const routesMap = {
-        // 1. Alertas Críticas (Rojo)
-        "ENV-1001": [
-          {
-            name: "Ruta 180 (Afectada por Inundación)",
-            coords: [[19.1738, -96.1342], [19.7500, -96.5000], [20.5332, -97.4560], [20.9500, -97.4000], [22.2331, -97.8611], [25.6866, -100.3161]],
-            color: '#EA4335',
-            dashArray: '6, 6',
-            weight: 4,
-            opacity: 0.9
-          },
-          {
-            name: "Ruta Alterna Plan B (Bodega MTY -> CEDIS Cuautitlán)",
-            coords: [[25.7785, -100.1876], [25.4232, -100.9922], [22.1565, -100.9855], [20.5888, -100.3899], [19.6711, -99.1783]],
-            color: '#34A853',
-            dashArray: '4, 6',
-            weight: 3.5,
-            opacity: 0.85
-          }
-        ],
-        "ENV-1004": [
-          {
-            name: "Corredor 57D (Tramo SLP Bloqueado)",
-            coords: [[19.4326, -99.1332], [20.5888, -100.3899], [22.1565, -100.9855], [23.6500, -100.6400], [25.4232, -100.9922], [25.6866, -100.3161]],
-            color: '#EA4335',
-            dashArray: '6, 6',
-            weight: 4,
-            opacity: 0.9
-          },
-          {
-            name: "Desvío Alterno Vía Aguascalientes - Zacatecas",
-            coords: [[20.5888, -100.3899], [21.8853, -102.2916], [22.7709, -102.5832], [25.5428, -103.4068], [25.6866, -100.3161]],
-            color: '#34A853',
-            dashArray: '4, 6',
-            weight: 3.5,
-            opacity: 0.85
-          }
-        ],
-        "ENV-1006": [
-          {
-            name: "Corredor Fronterizo Nuevo Laredo (Congestión)",
-            coords: [[25.6866, -100.3161], [26.5000, -100.0000], [27.4864, -99.5075], [27.5200, -99.4900]],
-            color: '#EA4335',
-            dashArray: '6, 6',
-            weight: 4,
-            opacity: 0.9
-          },
-          {
-            name: "Cruce Alterno Puente Colombia (Nuevo León)",
-            coords: [[25.6866, -100.3161], [26.8500, -100.4500], [27.7000, -99.7500]],
-            color: '#34A853',
-            dashArray: '4, 6',
-            weight: 3.5,
-            opacity: 0.85
-          }
-        ],
-        "ENV-1008": [
-          {
-            name: "Autopista México-Puebla 150D (Derrumbe Km 72 Río Frío)",
-            coords: [[19.4326, -99.1332], [19.3486, -98.6811], [19.0414, -98.2063], [18.8500, -97.1000], [19.1738, -96.1342]],
-            color: '#EA4335',
-            dashArray: '6, 6',
-            weight: 4,
-            opacity: 0.9
-          },
-          {
-            name: "Ruta Alterna Vía Arco Norte / Texcoco",
-            coords: [[19.6711, -99.1783], [19.6000, -98.8000], [19.4000, -98.3000], [19.0414, -98.2063]],
-            color: '#34A853',
-            dashArray: '4, 6',
-            weight: 3.5,
-            opacity: 0.85
-          }
-        ],
-        "ENV-1013": [
-          {
-            name: "Autopista Siglo XXI (Falla Mecánica de Convoy y Cierre)",
-            coords: [[19.7060, -101.1950], [19.4167, -102.0667], [18.7500, -102.1000], [17.9600, -102.2000]],
-            color: '#EA4335',
-            dashArray: '6, 6',
-            weight: 4,
-            opacity: 0.9
-          }
-        ],
-        "ENV-1014": [
-          {
-            name: "Autopista 15D Guadalajara - Tepic (Deslave en Barrancas)",
-            coords: [[20.6597, -103.3496], [20.8800, -103.8300], [20.9500, -104.0500], [21.5000, -104.9000], [23.2494, -106.4111]],
-            color: '#EA4335',
-            dashArray: '6, 6',
-            weight: 4,
-            opacity: 0.9
-          }
-        ],
 
-        // 2. Falta de Inventario (Amarillo)
-        "BOD-TOL": [
-          {
-            name: "Línea de Reabastecimiento Toluca Lerma <-> CEDIS Cuautitlán",
-            coords: [[19.2826, -99.5132], [19.3000, -99.3600], [19.3600, -99.2600], [19.4326, -99.1332], [19.6711, -99.1783]],
-            color: '#FBBC05',
-            dashArray: '5, 5',
-            weight: 3.5,
-            opacity: 0.9
-          }
-        ],
-        "BOD-QRO": [
-          {
-            name: "Línea de Reabastecimiento Querétaro Hub <-> CEDIS Bajío / CDMX",
-            coords: [[19.6711, -99.1783], [20.3900, -99.9900], [20.5888, -100.3899], [20.5200, -100.8100], [20.6700, -101.3500], [20.9167, -101.4000]],
-            color: '#FBBC05',
-            dashArray: '5, 5',
-            weight: 3.5,
-            opacity: 0.9
-          }
-        ],
-        "BOD-GDL": [
-          {
-            name: "Corredor Industrial Guadalajara El Salto <-> Bajío",
-            coords: [[20.5186, -103.2355], [20.6200, -103.0700], [20.8100, -102.7600], [21.3500, -101.9300], [20.9167, -101.4000], [20.5888, -100.3899]],
-            color: '#FBBC05',
-            dashArray: '5, 5',
-            weight: 3.5,
-            opacity: 0.9
-          },
-          {
-            name: "Línea de Conexión El Salto <-> Manzanillo",
-            coords: [[20.5186, -103.2355], [20.4200, -103.5900], [19.7047, -103.4617], [19.2433, -103.7250], [19.0522, -104.3158]],
-            color: '#FBBC05',
-            dashArray: '5, 5',
-            weight: 3,
-            opacity: 0.75
-          }
-        ],
-
-        // 3. Bodegas Plan B / Stock Disponible (Verde)
-        "BOD-MTY": [
-          {
-            name: "Red de Despacho Inmediato Monterrey Apodaca (Plan B)",
-            coords: [[25.7785, -100.1876], [25.6866, -100.3161], [25.4232, -100.9922], [23.6500, -100.6400], [22.1565, -100.9855], [20.5888, -100.3899], [19.6711, -99.1783]],
-            color: '#34A853',
-            dashArray: null,
-            weight: 3.5,
-            opacity: 0.85
-          }
-        ],
-        "BOD-CDMX": [
-          {
-            name: "Red de Despacho Inmediato Cuautitlán CDMX (Plan B)",
-            coords: [[19.6711, -99.1783], [19.2826, -99.5132], [20.5888, -100.3899], [19.0414, -98.2063]],
-            color: '#34A853',
-            dashArray: null,
-            weight: 3.5,
-            opacity: 0.85
-          }
-        ],
-        "BOD-VER": [
-          {
-            name: "Red de Despacho Terrestre Veracruz Puerto (Plan B)",
-            coords: [[19.1738, -96.1342], [18.8900, -96.9300], [18.8500, -97.1000], [19.0414, -98.2063], [19.4326, -99.1332]],
-            color: '#34A853',
-            dashArray: null,
-            weight: 3.5,
-            opacity: 0.85
-          }
-        ],
-
-        // 4. Flotas en Tránsito Normal (Azul)
-        "ENV-1002": [
-          {
-            name: "Ruta Carretera 57 (Monterrey - Saltillo)",
-            coords: [[25.6866, -100.3161], [25.4232, -100.9922], [24.0000, -101.0000]],
-            color: '#4285F4',
-            dashArray: null,
-            weight: 3.5,
-            opacity: 0.85
-          }
-        ],
-        "ENV-1003": [
-          {
-            name: "Ruta Corredor Occidente (Guadalajara - Bajío)",
-            coords: [[20.6597, -103.3496], [21.1200, -101.6800], [20.5888, -100.3899]],
-            color: '#4285F4',
-            dashArray: null,
-            weight: 3.5,
-            opacity: 0.85
-          }
-        ],
-        "ENV-1005": [
-          {
-            name: "Ruta Corredor Pacífico 15D (Hermosillo - Nogales)",
-            coords: [[27.4800, -109.9300], [29.0729, -110.9559], [30.7000, -111.1000], [31.3086, -110.9422]],
-            color: '#4285F4',
-            dashArray: null,
-            weight: 3.5,
-            opacity: 0.85
-          }
-        ],
-        "ENV-1007": [
-          {
-            name: "Ruta Carretera 45D (Querétaro - Silao)",
-            coords: [[20.5888, -100.3899], [20.5300, -100.8100], [20.5700, -101.2000], [20.9167, -101.4000]],
-            color: '#4285F4',
-            dashArray: null,
-            weight: 3.5,
-            opacity: 0.85
-          }
-        ],
-        "ENV-1009": [
-          {
-            name: "Ruta Autopista del Sol (CDMX - Cuernavaca - Acapulco)",
-            coords: [[19.4326, -99.1332], [18.9242, -99.2216], [17.5500, -99.5000], [16.8531, -99.8237]],
-            color: '#4285F4',
-            dashArray: null,
-            weight: 3.5,
-            opacity: 0.85
-          }
-        ],
-        "ENV-1010": [
-          {
-            name: "Ruta Carretera 180D (Mérida - Cancún)",
-            coords: [[19.8301, -90.5349], [20.9674, -89.5926], [20.6900, -88.2000], [21.1619, -86.8515]],
-            color: '#4285F4',
-            dashArray: null,
-            weight: 3.5,
-            opacity: 0.85
-          }
-        ],
-        "ENV-1011": [
-          {
-            name: "Ruta Carretera Fed 45 (Torreón - Chihuahua - Cd. Juárez)",
-            coords: [[25.5428, -103.4068], [27.1300, -104.9100], [28.6353, -106.0889], [31.6904, -106.4245]],
-            color: '#4285F4',
-            dashArray: null,
-            weight: 3.5,
-            opacity: 0.85
-          }
-        ],
-        "ENV-1012": [
-          {
-            name: "Ruta Corredor Fronterizo 2D (Tijuana - Mexicali - La Rumorosa)",
-            coords: [[32.5149, -117.0382], [32.5724, -116.6267], [32.5300, -116.0500], [32.6245, -115.4523]],
-            color: '#4285F4',
-            dashArray: null,
-            weight: 3.5,
-            opacity: 0.85
-          }
-        ]
-      };
-
-      return routesMap[item.id] || null;
+    setFilter(filterType) {
+      this.activeFilter = filterType;
+      this.renderMasterTopology();
     },
-    showRouteForMarker(item) {
-      this.clearActiveRoute();
-      
-      const routeList = this.getRouteData(item);
-      if (!routeList || routeList.length === 0) return;
 
-      this.activeRouteLayer = L.featureGroup().addTo(this.map);
-      this.selectedRouteName = item.nombre;
+    resetMapView() {
+      this.clearActiveSelection();
+      if (this.map) {
+        this.map.flyTo([23.6345, -102.5528], 5.2, { duration: 0.8 });
+      }
+    },
 
-      routeList.forEach(r => {
-        const polyline = L.polyline(r.coords, {
-          color: r.color,
-          weight: r.weight || 3.5,
-          opacity: r.opacity || 0.85,
-          dashArray: r.dashArray || null
-        }).addTo(this.activeRouteLayer);
+    clearActiveSelection() {
+      this.selectedRoute = null;
+      this.activeConsideration = null;
+      if (this.altRoutesLayerGroup) this.altRoutesLayerGroup.clearLayers();
+      this.renderMasterTopology();
+    },
 
-        polyline.bindTooltip(`<b>${r.name}</b>`, { sticky: true, opacity: 0.95 });
+    renderMasterTopology() {
+      if (!this.map) return;
+
+      // Limpiar capas previas
+      this.routesLayerGroup.clearLayers();
+      this.markersLayerGroup.clearLayers();
+      this.vehiclesLayerGroup.clearLayers();
+      this.alertsLayerGroup.clearLayers();
+      this.vehicleMarkers = {};
+
+      const showWarehouses = this.activeFilter === 'all' || this.activeFilter === 'warehouses';
+      const showVehicles = this.activeFilter === 'all' || this.activeFilter === 'vehicles';
+      const showDisruptedOnly = this.activeFilter === 'disrupted';
+
+      // 1. RENDERIZAR RUTAS / CORREDORES TERRESTRES CONTINUOS
+      (this.masterData.routes || []).forEach(route => {
+        if (showDisruptedOnly && route.estado !== 'Disrumpida') return;
+
+        const isDisrupted = route.estado === 'Disrumpida';
+        const polyline = L.polyline(route.coordenadas, {
+          color: route.color || (isDisrupted ? '#EA4335' : '#4285F4'),
+          weight: isDisrupted ? 4.5 : 3.5,
+          opacity: isDisrupted ? 0.9 : 0.75,
+          dashArray: route.dashArray || null
+        }).addTo(this.routesLayerGroup);
+
+        const statusLabel = isDisrupted ? '🚨 RUTA DISRUMPIDA' : '✅ CORREDOR OPERATIVO';
+        polyline.bindTooltip(`
+          <div style="font-family: Roboto, sans-serif; font-size: 11.5px; padding: 2px;">
+            <b style="color: ${isDisrupted ? '#EA4335' : '#1967d2'};">${statusLabel}</b><br>
+            <b>${route.nombre}</b><br>
+            <span>Distancia: ${route.distancia_km} km | Tiempo base: ${route.tiempo_base_hrs} hrs</span>
+            ${route.estado_motivo ? `<br><span style="color: #EA4335; font-size: 10.5px;"><b>Motivo:</b> ${route.estado_motivo}</span>` : ''}
+          </div>
+        `, { sticky: true, opacity: 0.95 });
+
+        polyline.on('click', () => {
+          this.selectRoute(route);
+        });
       });
 
-      // Enfocar suavemente el mapa en el corredor seleccionado asegurando que el marcador esté visible
-      try {
-        const bounds = this.activeRouteLayer.getBounds();
-        bounds.extend([item.lat, item.lon]);
-        if (bounds.isValid()) {
-          this.map.flyToBounds(bounds, { padding: [40, 40], maxZoom: 7, duration: 0.8 });
-        } else {
-          this.map.flyTo([item.lat, item.lon], 6.5, { duration: 0.8 });
-        }
-      } catch (e) {
-        this.map.flyTo([item.lat, item.lon], 6.5, { duration: 0.8 });
+      // 2. RENDERIZAR BODEGAS / CEDIS (ORÍGENES)
+      if (showWarehouses) {
+        (this.masterData.warehouses || []).forEach(wh => {
+          const isPlanB = wh.inventario_plan_b;
+          const bgGradient = isPlanB ? 'linear-gradient(135deg, #137333, #34A853)' : 'linear-gradient(135deg, #1a73e8, #4285F4)';
+          const badgeText = isPlanB ? 'CEDIS (Plan B)' : 'CEDIS Central';
+
+          const markerHtml = `
+            <div class="custom-map-marker" style="background: ${bgGradient}; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 2.5px solid white; cursor: pointer; transition: transform 0.2s;">
+              <i class="mdi ${wh.icono || 'mdi-warehouse'}" style="font-size: 19px;"></i>
+            </div>
+          `;
+
+          const customIcon = L.divIcon({
+            html: markerHtml,
+            className: 'custom-leaflet-icon',
+            iconSize: [36, 36],
+            iconAnchor: [18, 18]
+          });
+
+          const tooltipHtml = `
+            <div style="font-family: Roboto, sans-serif; min-width: 190px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="background: #e6f4ea; color: #137333; font-weight: 700; font-size: 10px; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">
+                  ${badgeText}
+                </span>
+                <span style="color: #5f6368; font-size: 10.5px; font-weight: 600;">${wh.id}</span>
+              </div>
+              <div style="font-weight: bold; font-size: 13px; color: #202124; margin-bottom: 3px;">${wh.nombre}</div>
+              <div style="font-size: 11px; color: #3c4043; line-height: 1.45;">
+                <b>Ubicación:</b> ${wh.ubicacion}<br>
+                <b>Capacidad:</b> ${wh.capacidad_m2.toLocaleString()} m²<br>
+                <b>Stock:</b> ${wh.stock_descripcion}<br>
+                ${wh.inventario_plan_b ? `<b style="color: #137333;">Disponibilidad Plan B:</b> ${wh.unidades_disponibles_plan_b} uds` : ''}
+              </div>
+            </div>
+          `;
+
+          const marker = L.marker([wh.lat, wh.lon], { icon: customIcon })
+            .addTo(this.markersLayerGroup)
+            .bindTooltip(tooltipHtml, { direction: 'top', offset: [0, -18], opacity: 0.98 });
+
+          marker.on('click', () => {
+            this.askLogisticaPrompt(`¿Cuál es la disponibilidad de inventario y capacidad de despacho Plan B en ${wh.nombre} (${wh.id}) para contingencias terrestres?`);
+          });
+        });
+
+        // 3. RENDERIZAR HUBS LOGÍSTICOS (DESTINOS)
+        (this.masterData.hubs || []).forEach(hub => {
+          const isFalta = hub.stock_status === 'Falta_Inventario';
+          const bgGradient = isFalta ? 'linear-gradient(135deg, #b06000, #FBBC05)' : 'linear-gradient(135deg, #5f6368, #80868b)';
+          const badgeBg = isFalta ? '#fef7e0' : '#f1f3f4';
+          const badgeColor = isFalta ? '#b06000' : '#3c4043';
+
+          const markerHtml = `
+            <div class="custom-map-marker" style="background: ${bgGradient}; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.25); border: 2.5px solid white; cursor: pointer;">
+              <i class="mdi ${hub.icono || 'mdi-transit-connection-variant'}" style="font-size: 18px;"></i>
+            </div>
+          `;
+
+          const customIcon = L.divIcon({
+            html: markerHtml,
+            className: 'custom-leaflet-icon',
+            iconSize: [34, 34],
+            iconAnchor: [17, 17]
+          });
+
+          const tooltipHtml = `
+            <div style="font-family: Roboto, sans-serif; min-width: 180px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="background: ${badgeBg}; color: ${badgeColor}; font-weight: 700; font-size: 10px; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">
+                  Hub Destino
+                </span>
+                <span style="color: #5f6368; font-size: 10.5px; font-weight: 600;">${hub.id}</span>
+              </div>
+              <div style="font-weight: bold; font-size: 13px; color: #202124; margin-bottom: 3px;">${hub.nombre}</div>
+              <div style="font-size: 11px; color: #3c4043; line-height: 1.45;">
+                <b>Cobertura:</b> ${hub.cobertura}<br>
+                <b>Estatus:</b> ${hub.stock_status}<br>
+                <span style="color: ${isFalta ? '#c5221f' : '#3c4043'};"><b>Detalle:</b> ${hub.stock_detalle}</span>
+              </div>
+            </div>
+          `;
+
+          const marker = L.marker([hub.lat, hub.lon], { icon: customIcon })
+            .addTo(this.markersLayerGroup)
+            .bindTooltip(tooltipHtml, { direction: 'top', offset: [0, -18], opacity: 0.98 });
+
+          marker.on('click', () => {
+            this.askLogisticaPrompt(`¿Cuál es el estatus de recepción y faltante de inventario en ${hub.nombre} (${hub.id})?`);
+          });
+        });
       }
-    },
-    clearActiveRoute() {
-      if (this.activeRouteLayer && this.map) {
-        this.map.removeLayer(this.activeRouteLayer);
-        this.activeRouteLayer = null;
-      }
-      this.selectedRouteName = '';
-    },
-    async loadMapData() {
-      let data = [
-        // 1. Alertas Críticas (Rojo)
-        { id: "ENV-1001", nombre: "Carretera Federal 180 (Costa Poza Rica - Tuxpan)", lat: 20.5332, lon: -97.4560, estado: "Retrasado (Inundación y Lluvias Torrenciales)", cliente: "AutoParts Premier", producto: "Autopartes - Motor V6", penalizacion_usd: 45000, criticidad: "Crítica", tipo: "alerta" },
-        { id: "ENV-1004", nombre: "Autopista 57D (San Luis Potosí - Matehuala)", lat: 22.1565, lon: -100.9855, estado: "Retrasado (Bloqueo Carretero y Obras)", cliente: "Industrias Metálicas del Norte", producto: "Bobinas de Acero Automotriz", penalizacion_usd: 28000, criticidad: "Crítica", tipo: "alerta" },
-        { id: "ENV-1006", nombre: "Puente Comercio Mundial (Nuevo Laredo)", lat: 27.4864, lon: -99.5075, estado: "Congestión Aduanal Crítica (>8 hrs espera)", cliente: "ExportLogix USA", producto: "Arneses Eléctricos Automotrices", penalizacion_usd: 18500, criticidad: "Crítica", tipo: "alerta" },
-        { id: "ENV-1008", nombre: "Autopista México-Puebla (Km 72 Río Frío)", lat: 19.3486, lon: -98.6811, estado: "Retraso (Derrumbe por Lluvias Intensas)", cliente: "FarmoQuímica Central", producto: "Insumos Médicos Refrigerados", penalizacion_usd: 15000, criticidad: "Crítica", tipo: "alerta" },
-        { id: "ENV-1013", nombre: "Autopista Siglo XXI (Uruapan - Lázaro Cárdenas)", lat: 18.7500, lon: -102.1000, estado: "Retrasado (Falla Mecánica de Convoy y Cierre de Carril)", cliente: "AceroMex Logistics", producto: "Planchas de Acero Estructural", penalizacion_usd: 22000, criticidad: "Crítica", tipo: "alerta" },
-        { id: "ENV-1014", nombre: "Autopista 15D (Guadalajara - Tepic, Plan de Barrancas)", lat: 20.9500, lon: -104.0500, estado: "Retrasado (Accidente Múltiple y Deslave)", cliente: "AgroFarma Occidente", producto: "Medicamentos de Alta Especialidad", penalizacion_usd: 31000, criticidad: "Crítica", tipo: "alerta" },
 
-        // 2. Falta de Inventario (Amarillo / Naranja)
-        { id: "BOD-TOL", nombre: "Bodega Toluca Parque Lerma", lat: 19.2826, lon: -99.5132, estado: "Falta de Inventario (0 unidades Motor V6)", cliente: "CEDIS Central Lerma", producto: "Autopartes - Motor V6 (Agotado)", penalizacion_usd: 0, criticidad: "Falta Inventario", tipo: "falta_stock" },
-        { id: "BOD-QRO", nombre: "Hub Logístico Querétaro Aeropuerto", lat: 20.5888, lon: -100.3899, estado: "Falta de Inventario (Stock Crítico Transmisiones <5%)", cliente: "CEDIS Bajío Industrial", producto: "Transmisiones Automotrices", penalizacion_usd: 0, criticidad: "Falta Inventario", tipo: "falta_stock" },
-        { id: "BOD-GDL", nombre: "Almacén Guadalajara El Salto", lat: 20.5186, lon: -103.2355, estado: "Falta de Inventario (Déficit de Sensores IoT)", cliente: "CEDIS Occidente", producto: "Sensores IoT & Microchips", penalizacion_usd: 0, criticidad: "Falta Inventario", tipo: "falta_stock" },
-
-        // 3. Inventario Disponible / Plan B (Verde)
-        { id: "BOD-MTY", nombre: "Bodega Monterrey Apodaca", lat: 25.7785, lon: -100.1876, estado: "Inventario Disponible (Plan B - 450 unidades)", cliente: "Propio (Stock)", producto: "Autopartes - Motor V6", penalizacion_usd: 0, criticidad: "Mitigación", tipo: "inventario_ok" },
-        { id: "BOD-CDMX", nombre: "Centro Distribución Cuautitlán CDMX", lat: 19.6711, lon: -99.1783, estado: "Inventario Disponible (Plan B - 320 unidades)", cliente: "Propio (Stock)", producto: "Autopartes - Motor V6", penalizacion_usd: 0, criticidad: "Mitigación", tipo: "inventario_ok" },
-        { id: "BOD-VER", nombre: "CEDIS Terrestre Veracruz Puerto", lat: 19.1738, lon: -96.1342, estado: "Inventario Disponible (Stock Respaldo Insumos)", cliente: "Propio (Stock)", producto: "Insumos & Repuestos Industriales", penalizacion_usd: 0, criticidad: "Mitigación", tipo: "inventario_ok" },
-
-        // 4. Flotas Correctas en Tránsito (Azul)
-        { id: "ENV-1002", nombre: "Carretera 57 (Monterrey - Saltillo)", lat: 25.4232, lon: -100.9922, estado: "En Tránsito Normal (95 km/h)", cliente: "TechMéxico S.A.", producto: "Servidores & Routers Cloud", penalizacion_usd: 0, criticidad: "Normal", tipo: "normal" },
-        { id: "ENV-1003", nombre: "Corredor Industrial (Guadalajara, Jal.)", lat: 20.6597, lon: -103.3496, estado: "Entregado a Tiempo", cliente: "Electrónica Bajío", producto: "Microcontroladores & Sensores", penalizacion_usd: 0, criticidad: "Normal", tipo: "normal" },
-        { id: "ENV-1005", nombre: "Corredor Pacífico 15D (Hermosillo - Nogales)", lat: 29.0729, lon: -110.9559, estado: "En Tránsito A Tiempo", cliente: "AgroExport del Noroeste", producto: "Sistemas de Riego IoT & Válvulas", penalizacion_usd: 0, criticidad: "Normal", tipo: "normal" },
-        { id: "ENV-1007", nombre: "Carretera 45D (Querétaro - Silao)", lat: 20.9167, lon: -101.4000, estado: "En Tránsito A Tiempo", cliente: "Bajío Assembly Corp", producto: "Componentes Electrónicos", penalizacion_usd: 0, criticidad: "Normal", tipo: "normal" },
-        { id: "ENV-1009", nombre: "Autopista del Sol (Cuernavaca - Acapulco)", lat: 18.9242, lon: -99.2216, estado: "En Tránsito Normal", cliente: "Distribuidora Sur", producto: "Equipos de Telecomunicación", penalizacion_usd: 0, criticidad: "Normal", tipo: "normal" },
-        { id: "ENV-1010", nombre: "Carretera 180D (Mérida - Cancún)", lat: 20.9674, lon: -89.5926, estado: "En Tránsito A Tiempo", cliente: "Riviera Logistics", producto: "Paneles Solares & Inversores", penalizacion_usd: 0, criticidad: "Normal", tipo: "normal" },
-        { id: "ENV-1011", nombre: "Carretera Fed 45 (Chihuahua - Cd. Juárez)", lat: 28.6353, lon: -106.0889, estado: "En Tránsito A Tiempo", cliente: "Maquilas Frontera", producto: "Semiconductores & PCBs", penalizacion_usd: 0, criticidad: "Normal", tipo: "normal" },
-        { id: "ENV-1012", nombre: "Carretera Fed 2D (Tijuana - Mexicali - La Rumorosa)", lat: 32.5149, lon: -116.6000, estado: "En Tránsito Normal", cliente: "Pacific Manufacturing", producto: "Módulos de Potencia EV", penalizacion_usd: 0, criticidad: "Normal", tipo: "normal" }
-      ];
-
-      try {
-        const response = await axios.get('/api/map');
-        if (Array.isArray(response.data) && response.data.length > 0) {
-          data = response.data;
-        }
-      } catch (e) {
-        console.warn('Usando dataset local para Mapa Logístico');
-      }
-
-      this.mapData = data;
-
-      data.forEach(item => {
-        let color = '#4285F4';
-        let iconStr = 'mdi-truck-fast';
-        let badgeColor = '#1967d2';
-        let badgeBg = '#e8f0fe';
-        let badgeLabel = 'Flota OK';
-        
-        if (item.criticidad === 'Crítica' || item.criticidad === 'Alerta' || item.tipo === 'alerta') {
-          color = '#EA4335';
-          iconStr = 'mdi-alert-octagon';
-          badgeColor = '#c5221f';
-          badgeBg = '#fce8e6';
-          badgeLabel = 'Alerta Crítica';
-        } else if (item.criticidad === 'Falta Inventario' || item.tipo === 'falta_stock') {
-          color = '#FBBC05';
-          iconStr = 'mdi-package-variant-remove';
-          badgeColor = '#b06000';
-          badgeBg = '#fef7e0';
-          badgeLabel = 'Falta Inventario';
-        } else if (item.criticidad === 'Mitigación' || item.tipo === 'inventario_ok') {
-          color = '#34A853';
-          iconStr = 'mdi-warehouse';
-          badgeColor = '#137333';
-          badgeBg = '#e6f4ea';
-          badgeLabel = 'Stock Plan B';
-        }
-        
+      // 4. RENDERIZAR ALERTAS VIALES (VINCULADAS A SEGMENTOS OPERATIVOS)
+      (this.masterData.alerts || []).forEach(alert => {
         const markerHtml = `
-          <div style="background-color: ${color}; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: ${color === '#FBBC05' ? '#202124' : 'white'}; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: 2px solid white; cursor: pointer;">
-            <i class="mdi ${iconStr}" style="font-size: 18px;"></i>
+          <div class="custom-map-marker" style="background: #EA4335; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 0 0 6px rgba(234,67,53,0.3), 0 4px 12px rgba(0,0,0,0.4); border: 2.5px solid white; cursor: pointer; animation: pulse 2s infinite;">
+            <i class="mdi ${alert.icono || 'mdi-alert-octagon'}" style="font-size: 20px;"></i>
           </div>
         `;
-        
+
         const customIcon = L.divIcon({
           html: markerHtml,
           className: 'custom-leaflet-icon',
-          iconSize: [34, 34],
-          iconAnchor: [17, 17]
+          iconSize: [38, 38],
+          iconAnchor: [19, 19]
         });
 
-        let tooltipHtml = `
-          <div style="font-family: Roboto, sans-serif; min-width: 185px;">
+        const tooltipHtml = `
+          <div style="font-family: Roboto, sans-serif; min-width: 210px;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
-              <span style="background: ${badgeBg}; color: ${badgeColor}; font-weight: 700; font-size: 10px; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">
-                ${badgeLabel}
+              <span style="background: #fce8e6; color: #c5221f; font-weight: 700; font-size: 10px; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">
+                ALERTA OPERATIVA CRÍTICA
               </span>
-              <span style="color: #6b7280; font-size: 11px; font-weight: 600;">${item.id}</span>
+              <span style="color: #5f6368; font-size: 10.5px; font-weight: 600;">${alert.id}</span>
             </div>
-            <div style="font-weight: bold; font-size: 13px; color: #202124; border-bottom: 1px solid #eee; padding-bottom: 3px; margin-bottom: 4px;">
-              ${item.nombre}
-            </div>
-            <div style="font-size: 11.5px; line-height: 1.5; color: #3c4043;">
-              <b>Estado:</b> ${item.estado}<br>
-              <b>Producto:</b> ${item.producto}<br>
-              ${item.cliente ? `<b>Cliente/Ref:</b> ${item.cliente}<br>` : ''}
-              ${item.penalizacion_usd > 0 ? `<b style="color: #EA4335;">Penalización:</b> $${item.penalizacion_usd.toLocaleString()} USD` : ''}
+            <div style="font-weight: bold; font-size: 13px; color: #202124; margin-bottom: 3px;">${alert.tipo_incidencia}</div>
+            <div style="font-size: 11px; color: #3c4043; line-height: 1.45;">
+              <b>Ruta Afectada:</b> ${alert.ruta_nombre}<br>
+              <b>Segmento:</b> ${alert.segmento}<br>
+              <b>Transportes Afectados:</b> ${alert.vehiculos_afectados_ids.join(', ')}<br>
+              <b style="color: #EA4335;">Retraso Estimado:</b> +${alert.retraso_estimado_hrs} hrs<br>
+              <b style="color: #EA4335;">Penalización en Riesgo:</b> $${alert.impacto_financiero_usd.toLocaleString()} USD
             </div>
           </div>
         `;
 
-        const marker = L.marker([item.lat, item.lon], { icon: customIcon })
-          .addTo(this.map)
-          .bindTooltip(tooltipHtml, { direction: 'top', offset: [0, -18], opacity: 0.98 });
+        const marker = L.marker([alert.lat, alert.lon], { icon: customIcon })
+          .addTo(this.alertsLayerGroup)
+          .bindTooltip(tooltipHtml, { direction: 'top', offset: [0, -20], opacity: 0.98 });
 
         marker.on('click', () => {
-          this.showRouteForMarker(item);
-          if (item.criticidad === 'Mitigación' || item.tipo === 'inventario_ok') {
-            this.userInput = `¿Qué disponibilidad de ${item.producto} tenemos en ${item.nombre} para mitigar los retrasos terrestres?`;
-          } else if (item.criticidad === 'Falta Inventario' || item.tipo === 'falta_stock') {
-            this.userInput = `⚠️ Alerta de Inventario: En ${item.nombre} reportan ${item.estado}. ¿Cómo afecta a la cadena de suministro terrestre y qué plan propones?`;
-          } else if (item.criticidad === 'Crítica' || item.criticidad === 'Alerta' || item.tipo === 'alerta') {
-            this.userInput = `🚨 Genera un reporte detallado del impacto y plan de contingencia para la alerta en ${item.nombre} (${item.id} - ${item.cliente}).`;
-          } else {
-            this.userInput = `¿Cuál es el estatus del envío ${item.id} en ${item.nombre} para ${item.cliente}?`;
-          }
-          this.$nextTick(() => {
-            const inputEl = document.querySelector('.chat-input input') || document.querySelector('input[placeholder*="Escribe una pregunta"]');
-            if (inputEl) inputEl.focus();
-          });
+          const matchingRoute = (this.masterData.routes || []).find(r => r.id === alert.ruta_id);
+          if (matchingRoute) this.selectRoute(matchingRoute);
+          this.askLogisticaPrompt(`🚨 Analiza el impacto operativo y financiero del bloqueo/alerta en ${alert.ruta_nombre} (${alert.segmento}). ¿Qué ruta alterna y plan de desvío se recomienda para las unidades ${alert.vehiculos_afectados_ids.join(', ')}?`);
         });
       });
+
+      // 5. RENDERIZAR VEHÍCULOS / FLOTAS EN TRÁNSITO
+      if (showVehicles) {
+        (this.masterData.vehicles || []).forEach(v => {
+          if (showDisruptedOnly && v.estado_operativo !== 'Afectado') return;
+
+          const isAfectado = v.estado_operativo === 'Afectado';
+          const isReenrutado = v.estado_operativo === 'Reenrutado';
+          
+          let bgColor = '#4285F4';
+          let iconName = 'mdi-truck-fast';
+          let badgeText = 'En Ruta OK';
+          let badgeBg = '#e8f0fe';
+          let badgeColor = '#1967d2';
+
+          if (isReenrutado) {
+            bgColor = '#34A853';
+            iconName = 'mdi-truck-check';
+            badgeText = 'Re-enrutado';
+            badgeBg = '#e6f4ea';
+            badgeColor = '#137333';
+          } else if (isAfectado) {
+            bgColor = '#EA4335';
+            iconName = 'mdi-truck-alert';
+            badgeText = 'Detenido / Riesgo';
+            badgeBg = '#fce8e6';
+            badgeColor = '#c5221f';
+          }
+
+          const markerHtml = `
+            <div class="custom-map-marker vehicle-marker-${v.id}" style="background: ${bgColor}; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: 2.5px solid white; cursor: pointer; transition: all 0.5s ease;">
+              <i class="mdi ${iconName}" style="font-size: 18px;"></i>
+            </div>
+          `;
+
+          const customIcon = L.divIcon({
+            html: markerHtml,
+            className: 'custom-leaflet-icon',
+            iconSize: [34, 34],
+            iconAnchor: [17, 17]
+          });
+
+          const tooltipHtml = `
+            <div style="font-family: Roboto, sans-serif; min-width: 200px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="background: ${badgeBg}; color: ${badgeColor}; font-weight: 700; font-size: 10px; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">
+                  ${badgeText}
+                </span>
+                <span style="color: #5f6368; font-size: 10.5px; font-weight: 600;">${v.id}</span>
+              </div>
+              <div style="font-weight: bold; font-size: 13px; color: #202124; margin-bottom: 3px;">${v.nombre}</div>
+              <div style="font-size: 11px; color: #3c4043; line-height: 1.45;">
+                <b>Carga:</b> ${v.carga}<br>
+                <b>Cliente:</b> ${v.cliente}<br>
+                <b>Origen ➔ Destino:</b> ${v.origen} ➔ ${v.destino}<br>
+                <b>Progreso:</b> ${v.progreso_pct}% | <b>Velocidad:</b> ${v.velocidad_kmh} km/h<br>
+                <b>Estatus:</b> ${v.estado_transito}<br>
+                ${v.penalizacion_usd > 0 ? `<b style="color: #EA4335;">Penalización en Riesgo:</b> $${v.penalizacion_usd.toLocaleString()} USD` : ''}
+              </div>
+            </div>
+          `;
+
+          const marker = L.marker([v.posicion_actual.lat, v.posicion_actual.lon], { icon: customIcon })
+            .addTo(this.vehiclesLayerGroup)
+            .bindTooltip(tooltipHtml, { direction: 'top', offset: [0, -18], opacity: 0.98 });
+
+          this.vehicleMarkers[v.id] = marker;
+
+          marker.on('click', () => {
+            const matchingRoute = (this.masterData.routes || []).find(r => r.id === v.ruta_id);
+            if (matchingRoute) this.selectRoute(matchingRoute);
+            this.askLogisticaPrompt(`¿Cuál es el estatus y plan de contingencia para la unidad ${v.nombre} (${v.id}) que transporta ${v.carga} para ${v.cliente}?`);
+          });
+        });
+      }
     },
+
+    selectRoute(route) {
+      if (!this.map) return;
+
+      this.selectedRoute = route;
+      this.altRoutesLayerGroup.clearLayers();
+
+      // Si la ruta tiene alternativa sugerida, dibujarla en verde brillante
+      if (route.alternativa) {
+        const altRoute = route.alternativa;
+        const altPolyline = L.polyline(altRoute.coordenadas, {
+          color: altRoute.color || '#34A853',
+          weight: 4.5,
+          opacity: 0.95,
+          dashArray: altRoute.dashArray || '6, 6'
+        }).addTo(this.altRoutesLayerGroup);
+
+        altPolyline.bindTooltip(`
+          <div style="font-family: Roboto, sans-serif; font-size: 11.5px; padding: 2px;">
+            <b style="color: #137333;">🛣️ RUTA ALTERNATIVA SUGERIDA</b><br>
+            <b>${altRoute.nombre}</b><br>
+            <span>Distancia: ${altRoute.distancia_km} km | ETA Estimado: ${altRoute.tiempo_estimado_hrs} hrs</span>
+          </div>
+        `, { sticky: true, opacity: 0.98 });
+
+        this.activeConsideration = {
+          ...altRoute,
+          ruta_origen_id: route.id,
+          ruta_origen_nombre: route.nombre
+        };
+      }
+
+      // Ajustar la vista suavemente a la extensión de la ruta sin distorsiones
+      try {
+        const allCoords = [...route.coordenadas];
+        if (route.alternativa && route.alternativa.coordenadas) {
+          allCoords.push(...route.alternativa.coordenadas);
+        }
+        const bounds = L.latLngBounds(allCoords);
+        if (bounds.isValid()) {
+          this.map.fitBounds(bounds, { padding: [50, 50], maxZoom: 8, animate: true, duration: 0.6 });
+        }
+      } catch (e) {
+        console.warn('Error al ajustar límites de ruta:', e);
+      }
+    },
+
+    applyReroute(consideration) {
+      if (!consideration) return;
+
+      this.reroutingAnimation = true;
+      const routeId = consideration.ruta_origen_id || (this.selectedRoute ? this.selectedRoute.id : null);
+      
+      // Encontrar vehículos en la ruta
+      const affectedVehicles = (this.masterData.vehicles || []).filter(v => v.ruta_id === routeId);
+      const altCoords = consideration.coordenadas || (this.selectedRoute?.alternativa?.coordenadas);
+
+      // Animar el desplazamiento del vehículo hacia el vector de la ruta alterna
+      if (affectedVehicles.length > 0 && altCoords && altCoords.length > 0) {
+        const targetCoord = altCoords[Math.floor(altCoords.length / 2)];
+        
+        affectedVehicles.forEach((veh, idx) => {
+          const marker = this.vehicleMarkers[veh.id];
+          if (marker) {
+            // Animar transición
+            const startLat = veh.posicion_actual.lat;
+            const startLon = veh.posicion_actual.lon;
+            const endLat = targetCoord[0] + (idx * 0.05);
+            const endLon = targetCoord[1] + (idx * 0.05);
+
+            let step = 0;
+            const steps = 20;
+            const interval = setInterval(() => {
+              step++;
+              const curLat = startLat + (endLat - startLat) * (step / steps);
+              const curLon = startLon + (endLon - startLon) * (step / steps);
+              marker.setLatLng([curLat, curLon]);
+              
+              if (step >= steps) {
+                clearInterval(interval);
+                veh.posicion_actual = { lat: endLat, lon: endLon };
+                veh.estado_operativo = 'Reenrutado';
+                veh.estado_transito = 'En tránsito por Ruta Alterna (ETA Recuperado)';
+                veh.penalizacion_usd = 0;
+                
+                // Actualizar icono visual
+                const el = document.querySelector(`.vehicle-marker-${veh.id}`);
+                if (el) {
+                  el.style.backgroundColor = '#34A853';
+                  el.innerHTML = '<i class="mdi mdi-truck-check" style="font-size: 18px;"></i>';
+                }
+              }
+            }, 30);
+          }
+        });
+      }
+
+      setTimeout(() => {
+        this.reroutingAnimation = false;
+        this.activeConsideration = null;
+        this.rerouteSuccessMessage = `✅ ¡Re-enrutamiento aprobado! ${affectedVehicles.map(v => v.id).join(', ')} incorporados al corredor alterno. Penalización evitada.`;
+        
+        // Agregar confirmación al chat
+        this.messages.push({
+          role: 'ai',
+          content: `### 🚀 Re-enrutamiento Operativo Aplicado con Éxito\n\n- **Ruta Alterna Activada:** ${consideration.nombre || consideration.alt_route_name}\n- **Unidades Desviadas:** ${affectedVehicles.map(v => `**${v.nombre}** (${v.id})`).join(', ')}\n- **Ahorro Neto Estimado:** $${(consideration.consideraciones?.ahorro_neto_usd || 27907).toLocaleString()} USD\n- **Nuevo ETA:** En tiempo contractual sin penalización SLA.\n\n*Las unidades han actualizado su trayectoria en el mapa en tiempo real.*`
+        });
+        this.scrollToBottom();
+
+        // Ocultar mensaje de éxito después de 6 segundos
+        setTimeout(() => {
+          this.rerouteSuccessMessage = '';
+        }, 6000);
+      }, 1000);
+    },
+
     askLogisticaPrompt(promptText) {
       this.userInput = promptText;
       this.$nextTick(() => {
-        const inputEl = document.querySelector('.chat-input input') || document.querySelector('input[placeholder*="Escribe una pregunta"]');
+        const inputEl = document.querySelector('input[placeholder*="Pregunta al agente"]');
         if (inputEl) inputEl.focus();
       });
     },
+
     scrollToBottom() {
       setTimeout(() => {
         const chatBox = document.getElementById('chat-box');
         if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
       }, 100);
     },
+
     async sendMessage() {
       if (!this.userInput.trim()) return;
 
@@ -616,22 +816,34 @@ const LogisticaView = {
           session_id: this.sessionId,
           message: text
         });
-        this.messages.push({ role: 'ai', content: response.data.response });
+
+        const data = response.data;
+        const aiMessage = data.response || 'Respuesta generada.';
+        this.messages.push({ role: 'ai', content: aiMessage });
+
+        // Si la IA emitió una sugerencia de re-enrutamiento estructurada (action_payload)
+        if (data.action_payload && data.action_payload.action === 'suggest_reroute') {
+          const act = data.action_payload;
+          const matchingRoute = (this.masterData.routes || []).find(r => r.id === act.route_id);
+          if (matchingRoute) {
+            this.selectRoute(matchingRoute);
+          }
+        }
       } catch (error) {
         console.error('Error en Agente de Logística:', error);
         const errDetail = error.response?.data?.detail || error.message || 'Error de conexión con Gemini.';
-        this.messages.push({ 
-          role: 'ai', 
-          content: `⚠️ **Error en el Agente de Logística:**\n\n${errDetail}` 
+        this.messages.push({
+          role: 'ai',
+          content: `⚠️ **Error en el Agente de Logística:**\n\n${errDetail}`
         });
       } finally {
         this.loading = false;
         this.scrollToBottom();
       }
     },
+
     formatResponse(text) {
       return marked.parse(text);
     }
   }
 };
-

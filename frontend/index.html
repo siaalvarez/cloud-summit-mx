@@ -231,13 +231,9 @@
       border-color: #137333 !important;
       box-shadow: 0 1px 3px rgba(52,168,83,0.2) !important;
     }
-    .fintech-matrix-container {
-      height: 210px;
-      max-height: 210px;
-      overflow-y: auto;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      background-color: #ffffff;
+    /* Ocultar completamente etiqueta de Leaflet para interfaz Google Maps limpia */
+    .leaflet-control-attribution {
+      display: none !important;
     }
   </style>
 </head>
@@ -329,9 +325,12 @@
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+  <!-- Dataset Local de Logística -->
+  <script src="/data/logisticaData.js?v=3.1"></script>
+
   <!-- Vistas Modulares de los Agentes -->
   <script src="/views/HomeView.js?v=3.0"></script>
-  <script src="/views/LogisticaView.js?v=3.0"></script>
+  <script src="/views/LogisticaView.js?v=3.1"></script>
   <script src="/views/RetailView.js?v=3.0"></script>
   <script src="/views/FintechView.js?v=3.0"></script>
 

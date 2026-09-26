@@ -1,0 +1,544 @@
+// frontend/data/logisticaData.js
+// Dataset Maestro Local de Logística Terrestre Nacional
+
+const LOGISTICA_MASTER_DATA = {
+  warehouses: [
+    {
+      id: "CEDIS-CDMX",
+      nombre: "CEDIS Central Cuautitlán (CDMX)",
+      ubicacion: "Cuautitlán Izcalli, Edo. Méx.",
+      lat: 19.6711,
+      lon: -99.1783,
+      tipo: "warehouse",
+      capacidad_m2: 45000,
+      stock_status: "Optimo",
+      stock_descripcion: "350 Motores V6, 15,000 SKUs alta rotación",
+      inventario_plan_b: true,
+      unidades_disponibles_plan_b: 320,
+      icono: "mdi-warehouse"
+    },
+    {
+      id: "CEDIS-MTY",
+      nombre: "CEDIS Macro Norte Apodaca (MTY)",
+      ubicacion: "Apodaca, Nuevo León",
+      lat: 25.7785,
+      lon: -100.1876,
+      tipo: "warehouse",
+      capacidad_m2: 38000,
+      stock_status: "Optimo",
+      stock_descripcion: "Stock de Respaldo Inmediato (Plan B)",
+      inventario_plan_b: true,
+      unidades_disponibles_plan_b: 450,
+      icono: "mdi-warehouse"
+    },
+    {
+      id: "CEDIS-GDL",
+      nombre: "CEDIS Occidente El Salto (GDL)",
+      ubicacion: "El Salto, Jalisco",
+      lat: 20.5186,
+      lon: -103.2355,
+      tipo: "warehouse",
+      capacidad_m2: 32000,
+      stock_status: "Alerta_Stock",
+      stock_descripcion: "Déficit crítico en Sensores IoT (<10%)",
+      inventario_plan_b: false,
+      unidades_disponibles_plan_b: 0,
+      icono: "mdi-warehouse"
+    },
+    {
+      id: "CEDIS-VER",
+      nombre: "CEDIS Portuario Terrestre (Veracruz)",
+      ubicacion: "Puerto de Veracruz, Ver.",
+      lat: 19.1738,
+      lon: -96.1342,
+      tipo: "warehouse",
+      capacidad_m2: 28000,
+      stock_status: "Optimo",
+      stock_descripcion: "Respaldo Insumos Médicos e Industriales",
+      inventario_plan_b: true,
+      unidades_disponibles_plan_b: 280,
+      icono: "mdi-warehouse"
+    }
+  ],
+  hubs: [
+    {
+      id: "HUB-QRO",
+      nombre: "Hub Logístico Querétaro Aeropuerto",
+      ubicacion: "El Marqués, Querétaro",
+      lat: 20.5888,
+      lon: -100.3899,
+      tipo: "hub",
+      cobertura: "Zona Bajío & Automotriz",
+      stock_status: "Falta_Inventario",
+      stock_detalle: "Transmisiones automotrices <5%",
+      icono: "mdi-transit-connection-variant"
+    },
+    {
+      id: "HUB-SLP",
+      nombre: "Hub San Luis Potosí Industrial",
+      ubicacion: "Zona Industrial SLP, S.L.P.",
+      lat: 22.1565,
+      lon: -100.9855,
+      tipo: "hub",
+      cobertura: "Corredor Central Metalmecánico",
+      stock_status: "Normal",
+      stock_detalle: "Esperando arribo de bobinas de acero",
+      icono: "mdi-transit-connection-variant"
+    },
+    {
+      id: "HUB-PUE",
+      nombre: "Hub Distribución Regional Puebla",
+      ubicacion: "Parque Industrial FINSA, Puebla",
+      lat: 19.0414,
+      lon: -98.2063,
+      tipo: "hub",
+      cobertura: "Centro - Oriente",
+      stock_status: "Normal",
+      stock_detalle: "Recepción de insumos hospitalarios",
+      icono: "mdi-transit-connection-variant"
+    },
+    {
+      id: "HUB-TOL",
+      nombre: "Hub Logístico Toluca Lerma",
+      ubicacion: "Parque Industrial Lerma, Edo. Méx.",
+      lat: 19.2826,
+      lon: -99.5132,
+      tipo: "hub",
+      cobertura: "Valle de Toluca",
+      stock_status: "Falta_Inventario",
+      stock_detalle: "0 unidades Motor V6 para línea de ensamblaje",
+      icono: "mdi-transit-connection-variant"
+    },
+    {
+      id: "HUB-NLD",
+      nombre: "Hub Fronterizo Nuevo Laredo",
+      ubicacion: "Nuevo Laredo, Tamaulipas",
+      lat: 27.4864,
+      lon: -99.5075,
+      tipo: "hub",
+      cobertura: "Cruce Comercial Internacional USA",
+      stock_status: "Congestion",
+      stock_detalle: "Saturación aduanal en patio fiscal",
+      icono: "mdi-transit-connection-variant"
+    },
+    {
+      id: "HUB-TIJ",
+      nombre: "Hub Fronterizo Tijuana Otay",
+      ubicacion: "Mesa de Otay, Tijuana, B.C.",
+      lat: 32.5348,
+      lon: -116.9427,
+      tipo: "hub",
+      cobertura: "Exportación California / Noroeste",
+      stock_status: "Normal",
+      stock_detalle: "Operación fluida",
+      icono: "mdi-transit-connection-variant"
+    }
+  ],
+  routes: [
+    {
+      id: "RUTA-57D-SLP",
+      nombre: "Corredor 57D (CDMX Cuautitlán -> Hub SLP)",
+      origen_id: "CEDIS-CDMX",
+      destino_id: "HUB-SLP",
+      distancia_km: 420,
+      tiempo_base_hrs: 5.5,
+      estado: "Disrumpida",
+      estado_motivo: "Bloqueo carretero y obras en Km 182",
+      color: "#EA4335",
+      dashArray: "6, 6",
+      coordenadas: [
+        [19.6711, -99.1783],
+        [19.9500, -99.5300],
+        [20.3500, -99.9800],
+        [20.5888, -100.3899],
+        [21.1619, -100.9300],
+        [21.8000, -100.8500],
+        [22.1565, -100.9855]
+      ],
+      alerta_id: "ALT-57D-BLOQUEO",
+      alternativa: {
+        id: "RUTA-57D-ALT",
+        nombre: "Desvío Vía Carretera 45D (Querétaro -> Aguascalientes -> Zacatecas -> SLP)",
+        distancia_km: 505,
+        tiempo_estimado_hrs: 6.75,
+        color: "#34A853",
+        dashArray: "4, 6",
+        coordenadas: [
+          [19.6711, -99.1783],
+          [20.5888, -100.3899],
+          [20.9167, -101.4000],
+          [21.8853, -102.2916],
+          [22.7709, -102.5832],
+          [22.1565, -100.9855]
+        ],
+        consideraciones: {
+          delta_tiempo: "+1.2 hrs de tránsito vs +7.5 hrs de bloqueo detenido",
+          delta_combustible_usd: 70,
+          delta_peajes_usd: 23,
+          ahorro_penalizacion_usd: 28000,
+          ahorro_neto_usd: 27907,
+          seguridad_vial: "Alta (Autopistas de cuota con cobertura satelital 100%)",
+          recomendacion: "Aprobar re-enrutamiento inmediato para evitar incumplimiento contractual SLA."
+        }
+      }
+    },
+    {
+      id: "RUTA-180-POZA",
+      nombre: "Corredor Costero Golfo 180 (CEDIS Veracruz -> CEDIS MTY)",
+      origen_id: "CEDIS-VER",
+      destino_id: "CEDIS-MTY",
+      distancia_km: 980,
+      tiempo_base_hrs: 12.0,
+      estado: "Disrumpida",
+      estado_motivo: "Inundación por lluvias torrenciales en Costa Poza Rica",
+      color: "#EA4335",
+      dashArray: "6, 6",
+      coordenadas: [
+        [19.1738, -96.1342],
+        [19.7500, -96.5000],
+        [20.5332, -97.4560],
+        [20.9500, -97.4000],
+        [22.2331, -97.8611],
+        [23.7369, -99.1411],
+        [25.7785, -100.1876]
+      ],
+      alerta_id: "ALT-180-INUNDACION",
+      alternativa: {
+        id: "RUTA-180-ALT",
+        nombre: "Desvío Altiplano Vía Arco Norte -> Carretera 57 (CDMX -> MTY)",
+        distancia_km: 1060,
+        tiempo_estimado_hrs: 13.5,
+        color: "#34A853",
+        dashArray: "4, 6",
+        coordenadas: [
+          [19.1738, -96.1342],
+          [18.8500, -97.1000],
+          [19.0414, -98.2063],
+          [19.6711, -99.1783],
+          [20.5888, -100.3899],
+          [22.1565, -100.9855],
+          [25.4232, -100.9922],
+          [25.7785, -100.1876]
+        ],
+        consideraciones: {
+          delta_tiempo: "+1.5 hrs de recorrido",
+          delta_combustible_usd: 120,
+          delta_peajes_usd: 45,
+          ahorro_penalizacion_usd: 45000,
+          ahorro_neto_usd: 44835,
+          seguridad_vial: "Óptima (Vía libre de anegaciones y clima seco)",
+          recomendacion: "Desviar el convoy y activar simultáneamente despacho de motores desde CEDIS MTY."
+        }
+      }
+    },
+    {
+      id: "RUTA-150D-PUE",
+      nombre: "Autopista 150D (CEDIS CDMX -> Hub Puebla)",
+      origen_id: "CEDIS-CDMX",
+      destino_id: "HUB-PUE",
+      distancia_km: 135,
+      tiempo_base_hrs: 2.0,
+      estado: "Disrumpida",
+      estado_motivo: "Derrumbe en Km 72 Río Frío",
+      color: "#EA4335",
+      dashArray: "6, 6",
+      coordenadas: [
+        [19.6711, -99.1783],
+        [19.4326, -99.1332],
+        [19.3486, -98.6811],
+        [19.0414, -98.2063]
+      ],
+      alerta_id: "ALT-150D-DERRUMBE",
+      alternativa: {
+        id: "RUTA-150D-ALT",
+        nombre: "Ruta Alterna Arco Norte / Texcoco -> Calpulalpan -> Puebla",
+        distancia_km: 168,
+        tiempo_estimado_hrs: 2.65,
+        color: "#34A853",
+        dashArray: "4, 6",
+        coordenadas: [
+          [19.6711, -99.1783],
+          [19.6000, -98.8000],
+          [19.5000, -98.5800],
+          [19.3000, -98.3500],
+          [19.0414, -98.2063]
+        ],
+        consideraciones: {
+          delta_tiempo: "+40 min",
+          delta_combustible_usd: 25,
+          delta_peajes_usd: 15,
+          ahorro_penalizacion_usd: 15000,
+          ahorro_neto_usd: 14960,
+          seguridad_vial: "Alta",
+          recomendacion: "Desviar unidades de transporte con insumos médicos refrigerados inmediatamente."
+        }
+      }
+    },
+    {
+      id: "RUTA-57-MTY-NLD",
+      nombre: "Corredor Fronterizo de Exportación (CEDIS MTY -> Hub Nuevo Laredo)",
+      origen_id: "CEDIS-MTY",
+      destino_id: "HUB-NLD",
+      distancia_km: 225,
+      tiempo_base_hrs: 2.75,
+      estado: "Disrumpida",
+      estado_motivo: "Congestión aduanal crítica (>8 hrs espera en Puente Comercio Mundial)",
+      color: "#EA4335",
+      dashArray: "6, 6",
+      coordenadas: [
+        [25.7785, -100.1876],
+        [26.5000, -100.0000],
+        [27.4864, -99.5075]
+      ],
+      alerta_id: "ALT-NLD-ADUANA",
+      alternativa: {
+        id: "RUTA-NLD-COLOMBIA",
+        nombre: "Desvío a Cruce Internacional Puente Colombia (Nuevo León)",
+        distancia_km: 245,
+        tiempo_estimado_hrs: 3.1,
+        color: "#34A853",
+        dashArray: "4, 6",
+        coordenadas: [
+          [25.7785, -100.1876],
+          [26.8500, -100.4500],
+          [27.7000, -99.7500]
+        ],
+        consideraciones: {
+          delta_tiempo: "Ahorro neto de 6.5 hrs de espera aduanal",
+          delta_combustible_usd: 35,
+          delta_peajes_usd: 18,
+          ahorro_penalizacion_usd: 18500,
+          ahorro_neto_usd: 18447,
+          seguridad_vial: "Óptima (Paso express por aduana de Colombia NL)",
+          recomendacion: "Cambiar pedimento fiscal y cruzar por Puente Colombia."
+        }
+      }
+    },
+    {
+      id: "RUTA-PACIFICO-GDL-TIJ",
+      nombre: "Corredor Pacífico 15D (CEDIS GDL -> Hub Tijuana)",
+      origen_id: "CEDIS-GDL",
+      destino_id: "HUB-TIJ",
+      distancia_km: 2240,
+      tiempo_base_hrs: 26.0,
+      estado: "Normal",
+      estado_motivo: "Tránsito regular y condiciones climáticas favorables",
+      color: "#4285F4",
+      dashArray: null,
+      coordenadas: [
+        [20.5186, -103.2355],
+        [21.5000, -104.9000],
+        [23.2494, -106.4111],
+        [27.4800, -109.9300],
+        [29.0729, -110.9559],
+        [32.5348, -116.9427]
+      ],
+      alerta_id: null,
+      alternativa: null
+    },
+    {
+      id: "RUTA-CENTRO-QRO-GDL",
+      nombre: "Corredor Bajío Occidente (Hub Querétaro -> CEDIS GDL)",
+      origen_id: "HUB-QRO",
+      destino_id: "CEDIS-GDL",
+      distancia_km: 360,
+      tiempo_base_hrs: 4.2,
+      estado: "Normal",
+      estado_motivo: "Tránsito fluido 90 km/h",
+      color: "#4285F4",
+      dashArray: null,
+      coordenadas: [
+        [20.5888, -100.3899],
+        [20.9167, -101.4000],
+        [20.8100, -102.7600],
+        [20.5186, -103.2355]
+      ],
+      alerta_id: null,
+      alternativa: null
+    }
+  ],
+  vehicles: [
+    {
+      id: "TRK-101",
+      nombre: "Transporte T-101 (Kenworth T680)",
+      ruta_id: "RUTA-57D-SLP",
+      origen: "CEDIS Central Cuautitlán",
+      destino: "Hub San Luis Potosí Industrial",
+      posicion_actual: { lat: 21.1619, lon: -100.9300 },
+      progreso_pct: 52,
+      velocidad_kmh: 0,
+      carga: "Bobinas de Acero Automotriz (32 Tons)",
+      cliente: "Industrias Metálicas del Norte",
+      penalizacion_usd: 28000,
+      estado_transito: "Detenido por bloqueo carretero en Km 182",
+      estado_operativo: "Afectado",
+      icono: "mdi-truck-alert"
+    },
+    {
+      id: "TRK-102",
+      nombre: "Transporte T-102 (Freightliner Cascadia)",
+      ruta_id: "RUTA-57D-SLP",
+      origen: "CEDIS Central Cuautitlán",
+      destino: "Hub San Luis Potosí Industrial",
+      posicion_actual: { lat: 20.5888, lon: -100.3899 },
+      progreso_pct: 35,
+      velocidad_kmh: 40,
+      carga: "Chasis y Estructuras Metálicas",
+      cliente: "Metalúrgica del Centro",
+      penalizacion_usd: 12000,
+      estado_transito: "Aproximándose al bloqueo (en Querétaro)",
+      estado_operativo: "Afectado",
+      icono: "mdi-truck-alert"
+    },
+    {
+      id: "TRK-103",
+      nombre: "Transporte T-103 (Volvo FH16 Doble Remolque)",
+      ruta_id: "RUTA-180-POZA",
+      origen: "CEDIS Portuario Veracruz",
+      destino: "CEDIS Macro Norte Apodaca",
+      posicion_actual: { lat: 20.5332, lon: -97.4560 },
+      progreso_pct: 48,
+      velocidad_kmh: 0,
+      carga: "Motores V6 Ensamblados (24 Unidades)",
+      cliente: "AutoParts Premier",
+      penalizacion_usd: 45000,
+      estado_transito: "Inmovilizado por inundación en Poza Rica",
+      estado_operativo: "Afectado",
+      icono: "mdi-truck-alert"
+    },
+    {
+      id: "TRK-104",
+      nombre: "Transporte T-104 (Kenworth T880 Termo)",
+      ruta_id: "RUTA-150D-PUE",
+      origen: "CEDIS Central Cuautitlán",
+      destino: "Hub Distribución Puebla",
+      posicion_actual: { lat: 19.3486, lon: -98.6811 },
+      progreso_pct: 55,
+      velocidad_kmh: 0,
+      carga: "Insumos Médicos Refrigerados (-20°C)",
+      cliente: "FarmoQuímica Central",
+      penalizacion_usd: 15000,
+      estado_transito: "Varado en Km 72 Río Frío por derrumbe",
+      estado_operativo: "Afectado",
+      icono: "mdi-truck-alert"
+    },
+    {
+      id: "TRK-105",
+      nombre: "Transporte T-105 (International ProStar)",
+      ruta_id: "RUTA-57-MTY-NLD",
+      origen: "CEDIS Macro Norte Apodaca",
+      destino: "Hub Fronterizo Nuevo Laredo",
+      posicion_actual: { lat: 27.4864, lon: -99.5075 },
+      progreso_pct: 92,
+      velocidad_kmh: 5,
+      carga: "Arneses Eléctricos Automotrices",
+      cliente: "ExportLogix USA",
+      penalizacion_usd: 18500,
+      estado_transito: "Detenido en fila fiscal aduanal (>8 hrs)",
+      estado_operativo: "Afectado",
+      icono: "mdi-truck-alert"
+    },
+    {
+      id: "TRK-106",
+      nombre: "Transporte T-106 (Scania R450)",
+      ruta_id: "RUTA-PACIFICO-GDL-TIJ",
+      origen: "CEDIS Occidente El Salto",
+      destino: "Hub Fronterizo Tijuana Otay",
+      posicion_actual: { lat: 27.4800, lon: -109.9300 },
+      progreso_pct: 62,
+      velocidad_kmh: 88,
+      carga: "Módulos de Potencia EV",
+      cliente: "Pacific Manufacturing",
+      penalizacion_usd: 0,
+      estado_transito: "En tránsito normal a tiempo (Hermosillo)",
+      estado_operativo: "Normal",
+      icono: "mdi-truck-fast"
+    },
+    {
+      id: "TRK-107",
+      nombre: "Transporte T-107 (Kenworth T680)",
+      ruta_id: "RUTA-CENTRO-QRO-GDL",
+      origen: "Hub Logístico Querétaro",
+      destino: "CEDIS Occidente El Salto",
+      posicion_actual: { lat: 20.9167, lon: -101.4000 },
+      progreso_pct: 45,
+      velocidad_kmh: 92,
+      carga: "Microcontroladores & Sensores",
+      cliente: "Electrónica Bajío",
+      penalizacion_usd: 0,
+      estado_transito: "En tránsito normal a tiempo (Silao - Irapuato)",
+      estado_operativo: "Normal",
+      icono: "mdi-truck-fast"
+    }
+  ],
+  alerts: [
+    {
+      id: "ALT-57D-BLOQUEO",
+      ruta_id: "RUTA-57D-SLP",
+      ruta_nombre: "Corredor 57D (CDMX -> SLP)",
+      segmento: "Km 182 Tramo Querétaro - San Luis Potosí",
+      lat: 21.1619,
+      lon: -100.9300,
+      tipo_incidencia: "Bloqueo Carretero y Obras Mayores",
+      severidad: "Crítica",
+      retraso_estimado_hrs: 7.5,
+      impacto_financiero_usd: 40000,
+      vehiculos_afectados_ids: ["TRK-101", "TRK-102"],
+      clientes_afectados: ["Industrias Metálicas del Norte", "Metalúrgica del Centro"],
+      descripcion: "Cierre total en ambos sentidos por manifestación de transportistas y reencarpetamiento.",
+      icono: "mdi-road-variant-alert"
+    },
+    {
+      id: "ALT-180-INUNDACION",
+      ruta_id: "RUTA-180-POZA",
+      ruta_nombre: "Corredor Costero Golfo 180 (Veracruz -> MTY)",
+      segmento: "Km 214 Tramo Costa Poza Rica - Tuxpan",
+      lat: 20.5332,
+      lon: -97.4560,
+      tipo_incidencia: "Inundación Severa por Ciclón Tropical",
+      severidad: "Crítica",
+      retraso_estimado_hrs: 10.0,
+      impacto_financiero_usd: 45000,
+      vehiculos_afectados_ids: ["TRK-103"],
+      clientes_afectados: ["AutoParts Premier"],
+      descripcion: "Nivel de agua en carpeta asfáltica >80cm. Paso cerrado por Protección Civil.",
+      icono: "mdi-weather-pouring"
+    },
+    {
+      id: "ALT-150D-DERRUMBE",
+      ruta_id: "RUTA-150D-PUE",
+      ruta_nombre: "Autopista 150D (CDMX -> Puebla)",
+      segmento: "Km 72 Tramo Río Frío - San Martín Texmelucan",
+      lat: 19.3486,
+      lon: -98.6811,
+      tipo_incidencia: "Derrumbe de Talud por Lluvias",
+      severidad: "Crítica",
+      retraso_estimado_hrs: 5.0,
+      impacto_financiero_usd: 15000,
+      vehiculos_afectados_ids: ["TRK-104"],
+      clientes_afectados: ["FarmoQuímica Central"],
+      descripcion: "Bloqueo de dos carriles sentido a Puebla por deslave de rocas.",
+      icono: "mdi-landslide"
+    },
+    {
+      id: "ALT-NLD-ADUANA",
+      ruta_id: "RUTA-57-MTY-NLD",
+      ruta_nombre: "Corredor Fronterizo (MTY -> Nuevo Laredo)",
+      segmento: "Acceso a Puente de Comercio Mundial (Nuevo Laredo)",
+      lat: 27.4864,
+      lon: -99.5075,
+      tipo_incidencia: "Caída de Sistema de Aduana y Congestión",
+      severidad: "Crítica",
+      retraso_estimado_hrs: 8.5,
+      impacto_financiero_usd: 18500,
+      vehiculos_afectados_ids: ["TRK-105"],
+      clientes_afectados: ["ExportLogix USA"],
+      descripcion: "Fila de más de 12 km para cruzar a Laredo, TX. Sistema de despacho intermitente.",
+      icono: "mdi-boom-gate-alert"
+    }
+  ]
+};
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = LOGISTICA_MASTER_DATA;
+}
