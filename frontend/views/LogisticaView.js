@@ -28,7 +28,8 @@ const LogisticaView = {
                 </v-chip>
                 <v-chip :color="affectedVehiclesCount > 0 ? 'error' : 'success'" size="small" variant="flat" class="font-weight-bold">
                   <v-icon start size="14">{{ affectedVehiclesCount > 0 ? 'mdi-truck-alert' : 'mdi-shield-check' }}</v-icon>
-                  <span v-if="rerouteApproved">0 en Riesgo • Desvío 45D Activo</span>
+                  <span v-if="roadblockCleared">0 en Riesgo • Vía 57D Normalizada</span>
+                  <span v-else-if="rerouteApproved">0 en Riesgo • Desvío 45D Activo</span>
                   <span v-else>{{ affectedVehiclesCount }} en Riesgo</span>
                 </v-chip>
                 <v-chip color="#34A853" size="small" variant="flat" class="font-weight-bold text-white">
@@ -62,7 +63,7 @@ const LogisticaView = {
                   @click="setFilter('disrupted')"
                 >
                   <v-icon start size="12">{{ affectedVehiclesCount > 0 ? 'mdi-alert-circle' : 'mdi-shield-check' }}</v-icon>
-                  {{ affectedVehiclesCount > 0 ? ('En Riesgo (' + affectedVehiclesCount + ')') : (rerouteApproved ? 'Flota Reenrutada (0)' : 'En Riesgo (0)') }}
+                  {{ affectedVehiclesCount > 0 ? ('En Riesgo (' + affectedVehiclesCount + ')') : (roadblockCleared ? 'Vía Normalizada (0)' : (rerouteApproved ? 'Flota Reenrutada (0)' : 'En Riesgo (0)')) }}
                 </v-btn>
                 <v-btn
                   size="x-small"
@@ -268,8 +269,18 @@ const LogisticaView = {
 
                       <div class="d-flex align-center justify-space-between mt-2 pt-1 border-t" style="gap: 8px;">
                         <div class="text-caption text-grey-darken-2" style="font-size: 11px;">
-                          <v-icon size="14" color="#34A853" class="mr-1">mdi-shield-check</v-icon>
-                          <b>Estrategia de Desvío:</b> Desvío anticipado para unidades en Querétaro y enlace San Felipe para unidades en bloqueo.
+                          <v-icon size="14" :color="roadblockCleared ? '#34A853' : (rerouteApproved ? '#137333' : '#34A853')" class="mr-1">
+                            {{ roadblockCleared ? 'mdi-check-all' : (rerouteApproved ? 'mdi-lock-open-variant' : 'mdi-shield-check') }}
+                          </v-icon>
+                          <span v-if="roadblockCleared">
+                            <b>Vía 57D Restablecida:</b> Nuevos transportes fluyen con normalidad por la ruta original.
+                          </span>
+                          <span v-else-if="rerouteApproved">
+                            <b>Paso 2 (Desbloqueado):</b> Flota en desvío seguro. Puedes dar por finalizada la alerta al reabrir la vía 57D.
+                          </span>
+                          <span v-else>
+                            <b>Estrategia de Desvío:</b> Desvío anticipado para unidades en Querétaro y enlace San Felipe para unidades en bloqueo.
+                          </span>
                         </div>
                         <div class="d-flex align-center" style="gap: 6px;">
                           <v-btn
@@ -284,9 +295,22 @@ const LogisticaView = {
                             <v-icon start size="16">mdi-check-decagram</v-icon>
                             Aprobar y Re-enrutar Flota
                           </v-btn>
-                          <v-chip v-else color="success" size="small" variant="flat" class="font-weight-bold">
-                            <v-icon start size="14">mdi-check-circle</v-icon> Flota Desviada con Éxito
-                          </v-chip>
+                          <template v-else>
+                            <v-btn
+                              v-if="!roadblockCleared"
+                              size="small"
+                              color="#137333"
+                              variant="flat"
+                              class="text-white text-capitalize font-weight-bold"
+                              @click="markAlertFinished()"
+                            >
+                              <v-icon start size="16">mdi-road-variant</v-icon>
+                              Marcar Alerta como Finalizada (Reabrir Ruta 57D)
+                            </v-btn>
+                            <v-chip v-else color="success" size="small" variant="flat" class="font-weight-bold">
+                              <v-icon start size="14">mdi-check-circle</v-icon> Vía Despejada • Ruta 57D Activa
+                            </v-chip>
+                          </template>
                         </div>
                       </div>
                     </div>
@@ -423,7 +447,7 @@ const LogisticaView = {
                     <div class="mt-2 pt-2 border-t d-flex align-center justify-space-between flex-wrap" style="gap: 8px;">
                       <div class="d-flex align-center flex-wrap" style="gap: 6px;">
                         <span class="text-caption font-weight-bold text-grey-darken-2 mr-1">
-                          Flota en este Corredor ({{ corridorVehicles.length }} activas):
+                          Flota en este Corredor ({{ corridorVehicles.length }} / {{ connectedRoute?.max_unidades || 18 }} máx):
                         </span>
                         <v-chip
                           v-for="v in corridorVehicles"
@@ -443,6 +467,155 @@ const LogisticaView = {
                       <v-btn size="small" variant="text" color="primary" class="text-capitalize font-weight-bold" @click="askLogisticaPrompt('Analiza el estatus de despacho e inventario Plan B en ' + selectedWarehouse.nombre)">
                         Consultar al Copiloto
                       </v-btn>
+                    </div>
+                  </v-card>
+                </div>
+              </v-slide-y-reverse-transition>
+
+              <!-- ======================================================== -->
+              <!-- CASO C: CONTENEDOR INFERIOR PARA ALERTA / INCIDENCIA     -->
+              <!-- ======================================================== -->
+              <v-slide-y-reverse-transition>
+                <div
+                  v-if="selectedEntity === 'alert' && selectedAlert"
+                  class="position-absolute px-3 pb-3"
+                  style="bottom: 0px; left: 0px; right: 0px; z-index: 999; pointer-events: none;"
+                >
+                  <v-card
+                    elevation="8"
+                    class="rounded-xl pa-3 bg-white"
+                    :style="{ border: (selectedAlert.estado === 'Resuelta' || roadblockCleared) ? '2px solid #34A853' : '2px solid #EA4335', pointerEvents: 'auto', boxShadow: '0 8px 28px rgba(0,0,0,0.2) !important', maxHeight: '310px', overflowY: 'auto' }"
+                  >
+                    <!-- Header Alerta -->
+                    <div class="d-flex align-center justify-space-between mb-2 pb-1 border-b">
+                      <div class="d-flex align-center">
+                        <v-avatar :color="(selectedAlert.estado === 'Resuelta' || roadblockCleared) ? '#e6f4ea' : (rerouteApproved ? '#e8f0fe' : '#fce8e6')" size="34" class="mr-2">
+                          <v-icon :color="(selectedAlert.estado === 'Resuelta' || roadblockCleared) ? '#137333' : (rerouteApproved ? '#1967d2' : '#d93025')" size="20">
+                            {{ (selectedAlert.estado === 'Resuelta' || roadblockCleared) ? 'mdi-check-circle' : (rerouteApproved ? 'mdi-shield-check' : 'mdi-alert-octagon') }}
+                          </v-icon>
+                        </v-avatar>
+                        <div>
+                          <div class="d-flex align-center flex-wrap" style="gap: 6px;">
+                            <span class="text-subtitle-2 font-weight-bold" style="color: #202124;">
+                              {{ (selectedAlert.estado === 'Resuelta' || roadblockCleared) ? 'Incidencia Resuelta - Vía Despejada' : (rerouteApproved ? 'Desvío Operativo por Autopista 45D' : selectedAlert.tipo_incidencia) }}
+                            </span>
+                            <v-chip
+                              size="x-small"
+                              :color="(selectedAlert.estado === 'Resuelta' || roadblockCleared) ? 'success' : (rerouteApproved ? 'primary' : 'error')"
+                              variant="flat"
+                              class="font-weight-bold"
+                            >
+                              {{ (selectedAlert.estado === 'Resuelta' || roadblockCleared) ? '✅ VÍA DESPEJADA' : (rerouteApproved ? '🛡️ DESVÍO 45D OPERATIVO' : '🚨 BLOQUEO ACTIVO') }}
+                            </v-chip>
+                          </div>
+                          <div class="text-caption text-grey-darken-1" style="font-size: 11px;">
+                            <b>ID:</b> {{ selectedAlert.id }} &nbsp;|&nbsp; <b>Ruta:</b> {{ selectedAlert.ruta_nombre }} &nbsp;|&nbsp; <b>Tramo:</b> {{ selectedAlert.segmento }}
+                          </div>
+                        </div>
+                      </div>
+                      <v-btn icon size="x-small" variant="text" @click="clearActiveSelection">
+                        <v-icon size="16">mdi-close</v-icon>
+                      </v-btn>
+                    </div>
+
+                    <!-- Ficha Resumen de Incidencia / Estado de Vía -->
+                    <v-row dense class="my-1">
+                      <v-col cols="12" sm="6">
+                        <div class="pa-2 rounded-lg bg-grey-lighten-4 fill-height" style="font-size: 11.5px; line-height: 1.5;">
+                          <div class="d-flex align-center mb-1">
+                            <v-icon size="16" color="#1a73e8" class="mr-1">mdi-map-marker-path</v-icon>
+                            <b>Segmento Carretero:</b>&nbsp;<span>{{ selectedAlert.segmento }}</span>
+                          </div>
+                          <div class="text-caption text-grey-darken-2" style="font-size: 11px;">
+                            {{ (selectedAlert.estado === 'Resuelta' || roadblockCleared) ? 'Vía completamente liberada por Guardia Nacional y SICT. Tránsito regular restablecido en ambos sentidos en el Km 182.' : (rerouteApproved ? 'Congestión en Km 182 siendo evitada. Las unidades fluyen con seguridad por el corredor alterno Autopista 45D.' : selectedAlert.descripcion) }}
+                          </div>
+                        </div>
+                      </v-col>
+
+                      <v-col cols="12" sm="6">
+                        <div class="pa-2 rounded-lg fill-height" :class="(selectedAlert.estado === 'Resuelta' || roadblockCleared) ? 'bg-green-lighten-5' : (rerouteApproved ? 'bg-blue-lighten-5' : 'bg-red-lighten-5')" style="font-size: 11.5px; line-height: 1.5;">
+                          <div class="d-flex align-center justify-space-between mb-1">
+                            <span class="font-weight-bold" :style="{ color: (selectedAlert.estado === 'Resuelta' || roadblockCleared) ? '#137333' : (rerouteApproved ? '#1967d2' : '#c5221f') }">
+                              {{ (selectedAlert.estado === 'Resuelta' || roadblockCleared) ? 'Condiciones Viales Normalizadas' : (rerouteApproved ? 'Desvío 45D Activo y Seguro' : 'Impacto Operativo en Riesgo') }}
+                            </span>
+                            <span v-if="!rerouteApproved && !roadblockCleared && selectedAlert.estado !== 'Resuelta'" class="font-weight-bold" style="color: #c5221f;">
+                              $ {{ selectedAlert.impacto_financiero_usd ? selectedAlert.impacto_financiero_usd.toLocaleString() : '54,000' }} USD
+                            </span>
+                            <span v-else-if="rerouteApproved && !roadblockCleared" class="font-weight-bold text-primary">
+                              $0 USD (Penalizaciones Evitadas)
+                            </span>
+                            <span v-else class="font-weight-bold text-success">
+                              $0 USD (Sin Demoras)
+                            </span>
+                          </div>
+                          <div class="text-caption text-grey-darken-2" style="font-size: 11px;">
+                            <b>Retraso Estimado:</b> {{ (selectedAlert.estado === 'Resuelta' || roadblockCleared) ? '0 hrs (Tránsito libre)' : (rerouteApproved ? '+1.8 hrs (Desvío seguro)' : '+' + selectedAlert.retraso_estimado_hrs + ' hrs') }}<br>
+                            <b>Estatus de Tránsito:</b> {{ (selectedAlert.estado === 'Resuelta' || roadblockCleared) ? 'Nuevos transportes fluyen directamente por Carretera 57D' : (rerouteApproved ? 'Flota circulando por Autopista 45D; Km 182 aún restringido' : 'Paso bloqueado en Km 182; aprueba la ruta alterna 45D para desahogar') }}
+                          </div>
+                        </div>
+                      </v-col>
+                    </v-row>
+
+                    <!-- Barra de Acciones: Control de Demo en 2 Fases (Paso 1: Aprobar Desvío -> Paso 2: Marcar como Finalizada) -->
+                    <div class="d-flex align-center justify-space-between mt-2 pt-2 border-t flex-wrap" style="gap: 8px;">
+                      <div class="text-caption text-grey-darken-2" style="font-size: 11px;">
+                        <v-icon size="14" :color="(selectedAlert.estado === 'Resuelta' || roadblockCleared) ? '#34A853' : (rerouteApproved ? '#137333' : '#d93025')" class="mr-1">
+                          {{ (selectedAlert.estado === 'Resuelta' || roadblockCleared) ? 'mdi-check-all' : (rerouteApproved ? 'mdi-lock-open-variant' : 'mdi-alert-circle-outline') }}
+                        </v-icon>
+                        <span v-if="selectedAlert.estado === 'Resuelta' || roadblockCleared">
+                          <b>Estatus Final:</b> Bloqueo levantado. Las nuevas unidades utilizan la ruta troncal original 57D. Pin conservado para registro histórico.
+                        </span>
+                        <span v-else-if="rerouteApproved">
+                          <b>Paso 2 (Desbloqueado para Demo):</b> Con la ruta despejada y la flota en desvío por 45D, puedes marcar la alerta como finalizada cuando la Guardia Nacional libere la vía.
+                        </span>
+                        <span v-else>
+                          <b>Paso 1 (Requerido):</b> La vía 57D está bloqueada. Aprueba primero la ruta alterna por Autopista 45D para desahogar las unidades y desbloquear la reapertura.
+                        </span>
+                      </div>
+
+                      <div class="d-flex align-center" style="gap: 8px;">
+                        <!-- FASE 1: Antes de aceptar la nueva ruta, mostrar botón para Aprobar Desvío -->
+                        <v-btn
+                          v-if="!rerouteApproved"
+                          size="small"
+                          color="#34A853"
+                          variant="flat"
+                          class="text-white text-capitalize font-weight-bold"
+                          @click="applyReroute(activeConsideration)"
+                          :loading="reroutingAnimation"
+                        >
+                          <v-icon start size="16">mdi-check-decagram</v-icon>
+                          Aprobar Desvío por Autopista 45D
+                        </v-btn>
+
+                        <!-- FASE 2: Una vez aceptada la ruta y despejado el camino, se DESBLOQUEA la finalización de la alerta -->
+                        <template v-else>
+                          <v-btn
+                            v-if="!roadblockCleared && selectedAlert.estado !== 'Resuelta'"
+                            size="small"
+                            color="#137333"
+                            variant="flat"
+                            class="text-white text-capitalize font-weight-bold"
+                            @click="markAlertFinished(selectedAlert)"
+                          >
+                            <v-icon start size="16">mdi-road-variant</v-icon>
+                            Marcar Alerta como Finalizada (Reabrir Ruta 57D)
+                          </v-btn>
+                          <v-chip v-else color="success" size="small" variant="flat" class="font-weight-bold">
+                            <v-icon start size="14">mdi-check-circle</v-icon> Alerta Finalizada • Ruta 57D Reabierta
+                          </v-chip>
+                        </template>
+
+                        <v-btn
+                          size="small"
+                          variant="text"
+                          color="primary"
+                          class="text-capitalize font-weight-bold"
+                          @click="askLogisticaPrompt('Explica el estado de la Carretera 57D y cómo se gestionan los nuevos transportes tras el levantamiento del bloqueo.')"
+                        >
+                          Consultar al Copiloto
+                        </v-btn>
+                      </div>
                     </div>
                   </v-card>
                 </div>
@@ -550,16 +723,18 @@ const LogisticaView = {
         alerts: []
       },
       activeFilter: 'all',
-      selectedEntity: null, // 'vehicle' | 'warehouse' | null
+      selectedEntity: null, // 'vehicle' | 'warehouse' | 'alert' | null
       selectedRoute: null,
       selectedVehicle: null,
       selectedWarehouse: null,
+      selectedAlert: null,
       activeConsideration: null,
       rerouteSuccessMessage: '',
       reroutingAnimation: false,
       rerouteApproved: false,
+      roadblockCleared: false,
       completedDeliveriesCount: 0,
-      unitCounter: 305,
+      unitCounter: 309,
       
       // Filtro de ruta activa para aislamiento visual
       activeRouteId: null,
@@ -585,8 +760,8 @@ const LogisticaView = {
     },
     affectedVehiclesCount() {
       const _tick = this.simulationTick;
-      if (this.rerouteApproved) {
-        return 0; // Desvío aprobado: toda la flota navega por rutas alternas seguras
+      if (this.rerouteApproved || this.roadblockCleared) {
+        return 0; // Desvío aprobado o bloqueo retirado: toda la flota navega sin riesgos
       }
       return (this.masterData.vehicles || []).filter(v => v.estado_operativo === 'Afectado').length;
     },
@@ -600,8 +775,8 @@ const LogisticaView = {
     },
     connectedRouteAlert() {
       if (!this.connectedRoute) return null;
-      if (this.rerouteApproved && this.connectedRoute.id === 'RUTA-CDMX-MTY') return null;
-      return (this.masterData.alerts || []).find(a => a.ruta_id === this.connectedRoute.id) || null;
+      if ((this.rerouteApproved || this.roadblockCleared) && this.connectedRoute.id === 'RUTA-CDMX-MTY') return null;
+      return (this.masterData.alerts || []).find(a => a.ruta_id === this.connectedRoute.id && a.estado !== 'Resuelta') || null;
     },
     corridorVehicles() {
       const _tick = this.simulationTick;
@@ -752,11 +927,15 @@ const LogisticaView = {
       }
 
       this.renderMasterTopology();
+      this.drawAllRoutes();
     },
 
     setFilter(filterType) {
       this.activeFilter = filterType;
       this.renderMasterTopology();
+      if (!this.activeRouteId) {
+        this.drawAllRoutes();
+      }
     },
 
     resetMapView() {
@@ -768,14 +947,14 @@ const LogisticaView = {
       this.selectedRoute = null;
       this.selectedVehicle = null;
       this.selectedWarehouse = null;
+      this.selectedAlert = null;
       this.activeConsideration = null;
       this.activeRouteId = null; // Quita el aislamiento por ruta
-      this.safeClearLayerGroup(this.routesLayerGroup);
-      this.safeClearLayerGroup(this.altRoutesLayerGroup);
       this.safeClearLayerGroup(this.originDestLayerGroup);
       
-      // Restablecer la totalidad de los pines en el mapa
+      // Restablecer la totalidad de los pines y los 3 corredores principales en el mapa
       this.renderMasterTopology();
+      this.drawAllRoutes();
 
       this.$nextTick(() => {
         if (this.map) {
@@ -899,11 +1078,62 @@ const LogisticaView = {
           return;
         }
 
-        const markerHtml = `
-          <div class="custom-map-marker" style="box-sizing: border-box; background: #EA4335; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 0 0 5px rgba(234,67,53,0.35), 0 4px 12px rgba(0,0,0,0.4); border: 2.5px solid white; cursor: pointer; user-select: none;">
-            <i class="mdi mdi-alert-octagon" style="font-size: 22px; line-height: 1; color: white;"></i>
-          </div>
-        `;
+        const isResolved = alert.estado === 'Resuelta' || this.roadblockCleared;
+
+        let markerHtml = '';
+        let tooltipHtml = '';
+
+        if (isResolved) {
+          // ESTADO RESUELTO / VÍA LIBERADA (VERDE GOOGLE #34A853)
+          markerHtml = `
+            <div class="custom-map-marker alert-marker-${alert.id}" style="box-sizing: border-box; background: #34A853; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 0 0 5px rgba(52,168,83,0.35), 0 4px 12px rgba(0,0,0,0.3); border: 2.5px solid white; cursor: pointer; user-select: none;">
+              <i class="mdi mdi-check-circle" style="font-size: 22px; line-height: 1; color: white;"></i>
+            </div>
+          `;
+
+          tooltipHtml = `
+            <div style="font-family: Roboto, sans-serif; min-width: 220px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="background: #e6f4ea; color: #137333; font-weight: 700; font-size: 10px; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">
+                  ✅ INCIDENCIA RESUELTA
+                </span>
+                <span style="color: #5f6368; font-size: 10.5px; font-weight: 600;">${alert.id}</span>
+              </div>
+              <div style="font-weight: bold; font-size: 13px; color: #202124; margin-bottom: 3px;">Vía Despejada - Bloqueo Retirado</div>
+              <div style="font-size: 11px; color: #3c4043; line-height: 1.45;">
+                <b>Ruta:</b> ${alert.ruta_nombre}<br>
+                <b>Segmento:</b> ${alert.segmento}<br>
+                <b>Estatus:</b> Tránsito regular restablecido por Guardia Nacional.<br>
+                <b style="color: #137333;">Nuevos transportes:</b> Circulando por ruta original 57D.
+              </div>
+            </div>
+          `;
+        } else {
+          // ESTADO ACTIVO / CRÍTICO (ROJO GOOGLE #EA4335)
+          markerHtml = `
+            <div class="custom-map-marker alert-marker-${alert.id}" style="box-sizing: border-box; background: #EA4335; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 0 0 5px rgba(234,67,53,0.35), 0 4px 12px rgba(0,0,0,0.4); border: 2.5px solid white; cursor: pointer; user-select: none;">
+              <i class="mdi mdi-alert-octagon" style="font-size: 22px; line-height: 1; color: white;"></i>
+            </div>
+          `;
+
+          tooltipHtml = `
+            <div style="font-family: Roboto, sans-serif; min-width: 220px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="background: #fce8e6; color: #c5221f; font-weight: 700; font-size: 10px; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">
+                  INCIDENCIA CRÍTICA
+                </span>
+                <span style="color: #5f6368; font-size: 10.5px; font-weight: 600;">${alert.id}</span>
+              </div>
+              <div style="font-weight: bold; font-size: 13px; color: #202124; margin-bottom: 3px;">${alert.tipo_incidencia}</div>
+              <div style="font-size: 11px; color: #3c4043; line-height: 1.45;">
+                <b>Ruta:</b> ${alert.ruta_nombre}<br>
+                <b>Segmento:</b> ${alert.segmento}<br>
+                <b>Retraso Proyectado:</b> +${alert.retraso_estimado_hrs} hrs<br>
+                <b style="color: #EA4335;">Impacto Financiero:</b> \${alert.impacto_financiero_usd ? alert.impacto_financiero_usd.toLocaleString() : '54,000'} USD
+              </div>
+            </div>
+          `;
+        }
 
         const customIcon = L.divIcon({
           html: markerHtml,
@@ -911,24 +1141,6 @@ const LogisticaView = {
           iconSize: [38, 38],
           iconAnchor: [19, 19]
         });
-
-        const tooltipHtml = `
-          <div style="font-family: Roboto, sans-serif; min-width: 220px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
-              <span style="background: #fce8e6; color: #c5221f; font-weight: 700; font-size: 10px; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">
-                INCIDENCIA CRÍTICA
-              </span>
-              <span style="color: #5f6368; font-size: 10.5px; font-weight: 600;">${alert.id}</span>
-            </div>
-            <div style="font-weight: bold; font-size: 13px; color: #202124; margin-bottom: 3px;">${alert.tipo_incidencia}</div>
-            <div style="font-size: 11px; color: #3c4043; line-height: 1.45;">
-              <b>Ruta:</b> ${alert.ruta_nombre}<br>
-              <b>Segmento:</b> ${alert.segmento}<br>
-              <b>Retraso Proyectado:</b> +${alert.retraso_estimado_hrs} hrs<br>
-              <b style="color: #EA4335;">Impacto Financiero:</b> \${alert.impacto_financiero_usd.toLocaleString()} USD
-            </div>
-          </div>
-        `;
 
         const marker = L.marker([alert.lat, alert.lon], { 
           icon: customIcon,
@@ -1032,6 +1244,119 @@ const LogisticaView = {
       });
     },
 
+    // DIBUJAR LOS 3 CORREDORES PRINCIPALES AL CARGAR EL MAPA O AL RESTABLECER VISTA
+    drawAllRoutes() {
+      if (!this.map) return;
+      this.safeClearLayerGroup(this.routesLayerGroup);
+      this.safeClearLayerGroup(this.altRoutesLayerGroup);
+      this.safeClearLayerGroup(this.originDestLayerGroup);
+
+      (this.masterData.routes || []).forEach(route => {
+        if (!route.coordenadas || route.coordenadas.length === 0) return;
+        if (this.activeFilter === 'disrupted' && route.estado !== 'Disrumpida') return;
+
+        const isDisrupted = route.estado === 'Disrumpida' && !this.roadblockCleared;
+        const color = isDisrupted ? '#EA4335' : (route.color || '#4285F4');
+        const weight = isDisrupted ? 4.5 : 3.5;
+        const opacity = isDisrupted ? 0.95 : 0.85;
+        const dashArray = isDisrupted ? '6, 6' : null;
+
+        const polyline = L.polyline(route.coordenadas, {
+          color: color,
+          weight: weight,
+          opacity: opacity,
+          dashArray: dashArray,
+          smoothFactor: 1.0
+        }).addTo(this.routesLayerGroup);
+
+        const statusLabel = isDisrupted 
+          ? '<b style="color: #EA4335;">🚨 CORREDOR DISRUMPIDO (Bloqueo Carretero Km 182)</b>' 
+          : '<b style="color: #1967d2;">✅ CORREDOR OPERATIVO</b>';
+
+        polyline.bindTooltip(`
+          <div style="font-family: Roboto, sans-serif; font-size: 11.5px; padding: 2px;">
+            ${statusLabel}<br>
+            <b>${route.nombre}</b><br>
+            <span>Distancia: ${route.distancia_km} km | Tiempo base: ${route.tiempo_base_hrs} hrs | Capacidad máx: ${route.max_unidades || 18} unidades</span><br>
+            <span style="color: #5f6368; font-size: 10px;">Clic para inspeccionar este corredor</span>
+          </div>
+        `, { opacity: 0.95 });
+
+        polyline.on('click', (e) => {
+          L.DomEvent.stopPropagation(e);
+          this.selectRoute(route);
+        });
+
+        polyline.on('mouseover', () => {
+          polyline.setStyle({ weight: weight + 2, opacity: 1.0 });
+        });
+        polyline.on('mouseout', () => {
+          polyline.setStyle({ weight: weight, opacity: opacity });
+        });
+
+        // Si es la ruta 57D y el desvío ya fue aprobado o la vía liberada, mostrar también las rutas alternas en verde
+        if (route.id === 'RUTA-CDMX-MTY' && (this.rerouteApproved || this.roadblockCleared) && route.alternativa) {
+          const alt = route.alternativa;
+          const coordsBloqueo = alt.coordenadas_bloqueo || alt.coordenadas;
+          if (coordsBloqueo && coordsBloqueo.length > 0) {
+            L.polyline(coordsBloqueo, {
+              color: '#34A853',
+              weight: 4,
+              opacity: 0.9,
+              dashArray: '6, 6'
+            }).addTo(this.altRoutesLayerGroup).bindTooltip(`
+              <div style="font-family: Roboto, sans-serif; font-size: 11px; padding: 2px;">
+                <b style="color: #137333;">🛣️ DESVÍO EN BLOQUEO (Km 182 ➔ Autopista 45D)</b>
+              </div>
+            `, { opacity: 0.95 });
+          }
+          const coordsAnticipado = alt.coordenadas_anticipado;
+          if (coordsAnticipado && coordsAnticipado.length > 0) {
+            L.polyline(coordsAnticipado, {
+              color: '#0F9D58',
+              weight: 4.5,
+              opacity: 0.9,
+              dashArray: '4, 6'
+            }).addTo(this.altRoutesLayerGroup).bindTooltip(`
+              <div style="font-family: Roboto, sans-serif; font-size: 11px; padding: 2px;">
+                <b style="color: #0d652d;">🛣️ DESVÍO ANTICIPADO 45D (CDMX ➔ Monterrey)</b>
+              </div>
+            `, { opacity: 0.95 });
+          }
+        }
+      });
+    },
+
+    selectRoute(route) {
+      if (!route) return;
+      this.selectedRoute = route;
+      this.activeRouteId = route.id;
+
+      // Si la ruta tiene una alerta de bloqueo activa, enfocar la alerta para dar control inmediato
+      const matchingAlert = (this.masterData.alerts || []).find(a => a.ruta_id === route.id && a.estado !== 'Resuelta');
+      if (matchingAlert && !this.roadblockCleared) {
+        this.selectAlert(matchingAlert);
+        return;
+      }
+
+      // Si hay un vehículo en tránsito en esta ruta, seleccionarlo para mostrar su ficha
+      const matchingVehicle = (this.masterData.vehicles || []).find(v => v.ruta_id === route.id && v.estado_operativo !== 'Completado');
+      if (matchingVehicle) {
+        this.selectVehicle(matchingVehicle);
+        return;
+      }
+
+      // O el CEDIS de origen
+      const originWh = (this.masterData.warehouses || []).find(w => w.id === route.origen_id);
+      if (originWh) {
+        this.selectWarehouse(originWh);
+        return;
+      }
+
+      this.drawRouteWithPins(route);
+      this.renderMasterTopology();
+    },
+
     // DIBUJAR RUTA BAJO DEMANDA (LÍNEAS LIMPIAS SIN PINES DUPLICADOS)
     drawRouteWithPins(route) {
       if (!this.map || !route || !route.coordenadas || route.coordenadas.length === 0) return;
@@ -1054,11 +1379,11 @@ const LogisticaView = {
         <div style="font-family: Roboto, sans-serif; font-size: 11.5px; padding: 2px;">
           <b style="color: ${isDisrupted ? '#EA4335' : '#1967d2'};">${isDisrupted ? '🚨 RUTA DISRUMPIDA' : '✅ CORREDOR OPERATIVO'}</b><br>
           <b>${route.nombre}</b><br>
-          <span>Distancia: ${route.distancia_km} km | Tiempo base: ${route.tiempo_base_hrs} hrs</span>
+          <span>Distancia: ${route.distancia_km} km | Tiempo base: ${route.tiempo_base_hrs} hrs | Capacidad máx: ${route.max_unidades || 18} unidades</span>
         </div>
       `, { opacity: 0.95 });
 
-      // Si la ruta tiene rutas alternas, dibujar ambas opciones en verde
+      // Mantener rutas alternas visibles en el mapa para seguimiento del operador incluso si la vía fue liberada
       if (route.alternativa) {
         const alt = route.alternativa;
 
@@ -1072,15 +1397,19 @@ const LogisticaView = {
             dashArray: '6, 6'
           }).addTo(this.altRoutesLayerGroup);
 
+          const descBloqueo = this.roadblockCleared 
+            ? 'Ruta alterna activa: Seguimiento continuo de unidades re-enrutadas (TRK-302, TRK-303, TRK-304) que completan su tránsito a destino'
+            : 'Ruta de desahogo para unidades retenidas en la zona de afectación (TRK-302, TRK-303, TRK-304)';
+
           polyBloqueo.bindTooltip(`
             <div style="font-family: Roboto, sans-serif; font-size: 11.5px; padding: 2px;">
               <b style="color: #137333;">🛣️ DESVÍO EN BLOQUEO (Km 182 ➔ San Felipe ➔ Autopista 45D)</b><br>
-              <span>Ruta de desahogo para unidades retenidas en la zona de afectación (TRK-302, TRK-303, TRK-304)</span>
+              <span>${descBloqueo}</span>
             </div>
           `, { opacity: 0.95 });
         }
 
-        // 2. Desvío Anticipado Completo (para nuevos despachos y tráfico previo a Querétaro)
+        // 2. Desvío Anticipado Completo (para despachos y tráfico previo por Querétaro-Celaya)
         const coordsAnticipado = alt.coordenadas_anticipado;
         if (coordsAnticipado && coordsAnticipado.length > 0) {
           const polyAnticipado = L.polyline(coordsAnticipado, {
@@ -1090,10 +1419,14 @@ const LogisticaView = {
             dashArray: '4, 6'
           }).addTo(this.altRoutesLayerGroup);
 
+          const descAnticipado = this.roadblockCleared
+            ? 'Ruta alterna 45D activa: Seguimiento continuo de unidades que tomaron el desvío antes de la reapertura vial'
+            : 'Ruta continua para unidades que evitan completamente el bloqueo carretero';
+
           polyAnticipado.bindTooltip(`
             <div style="font-family: Roboto, sans-serif; font-size: 11.5px; padding: 2px;">
               <b style="color: #0d652d;">🛣️ DESVÍO ANTICIPADO COMPLETO (CDMX ➔ Celaya ➔ 45D ➔ MTY)</b><br>
-              <span>Ruta continua para nuevas unidades que evitan completamente el bloqueo carretero</span>
+              <span>${descAnticipado}</span>
             </div>
           `, { opacity: 0.95 });
         }
@@ -1112,6 +1445,7 @@ const LogisticaView = {
       this.selectedEntity = 'vehicle';
       this.selectedVehicle = v;
       this.selectedWarehouse = null;
+      this.selectedAlert = null;
       
       const matchingRoute = (this.masterData.routes || []).find(r => r.id === v.ruta_id);
       if (matchingRoute) {
@@ -1146,6 +1480,7 @@ const LogisticaView = {
       this.selectedEntity = 'warehouse';
       this.selectedWarehouse = wh;
       this.selectedVehicle = null;
+      this.selectedAlert = null;
 
       // Buscar rutas conectadas a este CEDIS
       const connected = (this.masterData.routes || []).find(r => r.origen_id === wh.id || r.destino_id === wh.id);
@@ -1177,18 +1512,17 @@ const LogisticaView = {
     },
 
     selectAlert(alert) {
+      this.selectedEntity = 'alert';
+      this.selectedAlert = alert;
+      this.selectedVehicle = null;
+      this.selectedWarehouse = null;
+
       const matchingRoute = (this.masterData.routes || []).find(r => r.id === alert.ruta_id);
       if (matchingRoute) {
         this.selectedRoute = matchingRoute;
         this.activeRouteId = matchingRoute.id;
         this.drawRouteWithPins(matchingRoute);
         this.renderMasterTopology();
-        
-        const affectedVeh = (this.masterData.vehicles || []).find(v => v.id === alert.vehiculos_afectados_ids[0]);
-        if (affectedVeh) {
-          this.selectedEntity = 'vehicle';
-          this.selectedVehicle = affectedVeh;
-        }
 
         this.$nextTick(() => {
           if (!this.map) return;
@@ -1209,7 +1543,9 @@ const LogisticaView = {
           }
         });
       }
-      this.askLogisticaPrompt(`🚨 Analiza el impacto del bloqueo en ${alert.ruta_nombre} (${alert.segmento}). ¿Qué plan de desvío anticipado se recomienda?`);
+      if (!this.roadblockCleared && alert.estado !== 'Resuelta') {
+        this.askLogisticaPrompt(`🚨 Analiza el impacto del bloqueo en ${alert.ruta_nombre} (${alert.segmento}). ¿Qué plan de desvío anticipado se recomienda?`);
+      }
     },
 
     // CÁLCULO DE DISTANCIA HAVERSINE EN KM
@@ -1238,14 +1574,19 @@ const LogisticaView = {
       // Incrementar contador de simulación para forzar reactividad en componentes computados
       this.simulationTick = (this.simulationTick || 0) + 1;
 
-      // Despacho regular programado para enriquecer la frecuencia del corredor CDMX-MTY (más unidades en mapa)
+      // Despacho regular programado en el corredor CDMX-MTY respetando el cupo máximo (máx 18 unidades)
+      // En rutas impactadas sin desvío ni reapertura, el origen retiene salidas para evitar saturar el bloqueo
       this.mtyDispatchTicks = (this.mtyDispatchTicks || 0) + 1;
-      if (this.mtyDispatchTicks >= 6) { // Cada ~21 segundos
+      if (this.mtyDispatchTicks >= 7) { // Cada ~25 segundos
         this.mtyDispatchTicks = 0;
+        const routeMty = (this.masterData.routes || []).find(r => r.id === 'RUTA-CDMX-MTY');
+        const maxMty = routeMty?.max_unidades || 18;
         const activeMtyCount = (this.masterData.vehicles || []).filter(v => 
           v.ruta_id === 'RUTA-CDMX-MTY' && v.estado_operativo !== 'Completado'
         ).length;
-        if (activeMtyCount < 14) {
+        
+        // Solo despachar si hay cupo bajo el límite Y la ruta no está bloqueada sin alternativa
+        if (activeMtyCount < maxMty && (this.rerouteApproved || this.roadblockCleared)) {
           this.spawnContinuousUnit('RUTA-CDMX-MTY');
         }
       }
@@ -1302,8 +1643,8 @@ const LogisticaView = {
         }
 
         // 2. DETECCIÓN DINÁMICA DE PROXIMIDAD A LA ALERTA (RUTA 57D)
-        // Solo aplica si el desvío aún no ha sido aprobado
-        if (!this.rerouteApproved && alert57D && v.ruta_id === 'RUTA-CDMX-MTY' && v.estado_operativo !== 'Reenrutado') {
+        // Solo aplica si el desvío aún no ha sido aprobado y el bloqueo continúa activo
+        if (!this.rerouteApproved && !this.roadblockCleared && alert57D && alert57D.estado !== 'Resuelta' && v.ruta_id === 'RUTA-CDMX-MTY' && v.estado_operativo !== 'Reenrutado') {
           const distToAlert = this.getDistanceKm(v.posicion_actual.lat, v.posicion_actual.lon, alert57D.lat, alert57D.lon);
           
           if ((v.segment_index || 0) <= 4) {
@@ -1526,10 +1867,93 @@ const LogisticaView = {
       }
     },
 
-    // GENERADOR DE FLUJO PERPETUO: DESPACHO CONTINUO DE UNIDADES AL COMPLETAR ENTREGA
+    // RESOLUCIÓN DE ALERTA: FINALIZACIÓN DE BLOQUEO Y REAPERTURA DE RUTA 57D ORIGINAL
+    markAlertFinished(targetAlert) {
+      this.roadblockCleared = true;
+
+      // 1. Encontrar y actualizar la alerta
+      const alert = targetAlert || this.selectedAlert || (this.masterData.alerts || []).find(a => a.id === 'ALT-57D-BLOQUEO');
+      if (alert) {
+        alert.estado = 'Resuelta';
+        alert.tipo_incidencia = 'Bloqueo Retirado - Vía Despejada';
+        alert.descripcion = 'Vía completamente liberada por Guardia Nacional y SICT. Tránsito regular restablecido en ambos sentidos en el Km 182 de la Carretera 57D.';
+        alert.icono = 'mdi-check-decagram';
+        alert.color = '#34A853';
+        alert.severidad = 'Resuelta';
+        alert.retraso_estimado_hrs = 0;
+        alert.impacto_financiero_usd = 0;
+        alert.vehiculos_afectados_ids = [];
+      }
+
+      // 2. Normalizar la ruta 57D original
+      const route57 = (this.masterData.routes || []).find(r => r.id === 'RUTA-CDMX-MTY');
+      if (route57) {
+        route57.estado = 'Operativa';
+        route57.estado_motivo = 'Carretera 57D reabierta en Km 182. Despachos y tránsito normalizados.';
+        route57.color = '#4285F4';
+        route57.dashArray = null;
+      }
+
+      // 3. Unidades en la ruta 57D que no han tomado desvíos o que aún están en tramos iniciales
+      (this.masterData.vehicles || []).forEach(v => {
+        if (v.ruta_id === 'RUTA-CDMX-MTY') {
+          // Si estaba programado con desvío anticipado pero aún no rebasa Querétaro (segment_index <= 3)
+          if (v.desvio_tipo === 'anticipado' && (v.segment_index || 0) <= 3) {
+            v.desvio_tipo = null;
+            v.estado_operativo = 'Normal';
+            v.velocidad_kmh = 80;
+            v.estado_transito = 'Continuando directamente por Carretera 57D (bloqueo retirado)';
+          } else if (v.estado_operativo === 'Afectado') {
+            v.estado_operativo = 'Normal';
+            v.velocidad_kmh = 76;
+            v.penalizacion_usd = 0;
+            v.estado_transito = 'Reanudando marcha normal por Carretera 57D (vía liberada)';
+          }
+        }
+      });
+
+      // 4. Refrescar visualización del mapa conservando el pin de la alerta en su nuevo estado verde resuelto
+      this.renderMasterTopology();
+      if (route57) {
+        this.drawRouteWithPins(route57);
+      }
+
+      // 5. Notificación y mensaje de análisis al panel del Agente Copiloto IA
+      this.rerouteSuccessMessage = '🛣️ ¡Vía Liberada! Guardia Nacional retira el bloqueo en Km 182 de Carretera 57D. Los nuevos transportes fluyen por la ruta original.';
+
+      this.messages.push({
+        role: 'ai',
+        content: `### 🟢 Actualización Vial en Vivo: Bloqueo Retirado en Km 182 (Carretera 57D)\n\n- **Estatus de la Vía:** La Guardia Nacional y la SICT han concluido las labores y despejado la circulación en ambos sentidos del Km 182.\n- **Ruta Troncal Original:** Restablecida como corredor principal. Todos los **nuevos transportes despachados** desde CEDIS Cuautitlán circularán directamente por la **Carretera 57D**.\n- **Unidades en Tránsito Previo:** Los transportes que no alcanzaron a desviarse continúan por la 57D sin demoras adicionales.\n- **Unidades en Desvío 45D:** Aquellas que ya habían ingresado a la Autopista 45D (\`TRK-302\`, \`TRK-303\`, \`TRK-304\`) completan su recorrido con seguridad hacia Apodaca.\n- **Registro Informativo:** El pin en el Km 182 se mantiene en verde en el mapa para fines de trazabilidad e información.`
+      });
+      this.scrollToBottom();
+
+      setTimeout(() => {
+        this.rerouteSuccessMessage = '';
+      }, 7000);
+    },
+
+    // GENERADOR DE FLUJO CONTROLADO: DESPACHO CONTINUO RESPETANDO CUPO MÁXIMO POR CORREDOR
     spawnContinuousUnit(routeId) {
       const route = (this.masterData.routes || []).find(r => r.id === routeId);
       if (!route || !route.coordenadas || route.coordenadas.length === 0) return;
+
+      // 1. Validar límite máximo de unidades por ruta (entre 15 y 18 unidades)
+      const maxUnits = route.max_unidades || 18;
+      const activeUnitsOnRoute = (this.masterData.vehicles || []).filter(v => 
+        v.ruta_id === route.id && v.estado_operativo !== 'Completado'
+      ).length;
+
+      if (activeUnitsOnRoute >= maxUnits) {
+        return; // Límite máximo alcanzado; no despachar más unidades
+      }
+
+      // 2. Control en rutas impactadas: si la ruta sufre un bloqueo activo sin desvío aprobado ni reapertura,
+      // el CEDIS origen retiene despachos y no crea unidades de forma infinita hacia el retén
+      const isBlockedCorridor = !this.rerouteApproved && !this.roadblockCleared && 
+        (route.id === 'RUTA-CDMX-MTY' || route.estado === 'Disrumpida');
+      if (isBlockedCorridor) {
+        return;
+      }
 
       this.unitCounter = (this.unitCounter || 310) + 1;
       const newId = `TRK-${this.unitCounter}`;
@@ -1544,7 +1968,7 @@ const LogisticaView = {
       ];
       const cargoItem = cargoCatalog[Math.floor(Math.random() * cargoCatalog.length)];
       
-      const isReroutedCorridor = this.rerouteApproved && route.id === 'RUTA-CDMX-MTY';
+      const isReroutedCorridor = this.rerouteApproved && !this.roadblockCleared && route.id === 'RUTA-CDMX-MTY';
       const now = new Date();
       const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')} hrs`;
 
@@ -1563,7 +1987,9 @@ const LogisticaView = {
         desvio_tipo: isReroutedCorridor ? 'anticipado' : null,
         estado_transito: isReroutedCorridor 
           ? 'Despachado con desvío anticipado programado vía Autopista 45D' 
-          : 'Despacho reciente desde andén de salida del CEDIS',
+          : (this.roadblockCleared && route.id === 'RUTA-CDMX-MTY'
+              ? 'Despachado por Carretera 57D original (vía liberada)'
+              : 'Despacho reciente desde andén de salida del CEDIS'),
         carga: cargoItem.carga,
         peso_ton: cargoItem.peso_ton,
         cliente: cargoItem.cliente,
