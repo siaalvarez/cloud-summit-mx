@@ -18,9 +18,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-PROJECT_ID = "cloud-summit-mx"
+PROJECT_ID = os.getenv("PROJECT_ID", "cymbal-bus-showcase")
 DATASET_ID = f"{PROJECT_ID}.logistica_demo"
-LOCATION = "us-central1"
+LOCATION = "global"
 
 # Inicializar clientes
 bq_client = bigquery.Client(project=PROJECT_ID)
@@ -45,9 +45,9 @@ buscar_alternativas_func = FunctionDeclaration(
 
 logistics_tool = Tool(function_declarations=[consultar_envios_func, buscar_alternativas_func])
 
-# Inicializar Modelo (Usaremos Flash 2.5 porque es la versión más reciente disponible en este proyecto)
+# Inicializar Modelo con Gemini 3.8 Flash en endpoint global
 model = GenerativeModel(
-    "gemini-2.5-flash",
+    "gemini-3.8-flash",
     tools=[logistics_tool],
     system_instruction="""Eres un Copiloto Ejecutivo de Logística impulsado por Gemini para directivos en México.
 Tu objetivo es impresionar en una demostración (Google Cloud Summit). Tus respuestas deben ser MUY ejecutivas, visualmente atractivas y directas al grano.

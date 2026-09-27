@@ -21,31 +21,72 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-PROJECT_ID = os.getenv("PROJECT_ID", "cloud-summit-mx")
+def get_project_id():
+    env_proj = os.getenv("PROJECT_ID")
+    if env_proj:
+        return env_proj
+    try:
+        import google.auth
+        _, auth_proj = google.auth.default()
+        if auth_proj:
+            return auth_proj
+    except Exception:
+        pass
+    return "cymbal-bus-showcase"
+
+PROJECT_ID = get_project_id()
 LOCATION = os.getenv("LOCATION", "global")
 MODEL_CANDIDATES = [
     os.getenv("GEMINI_MODEL", "gemini-3.8-flash"),
     "gemini-3.8-flash",
     "gemini-2.5-flash",
-    "gemini-2.0-flash",
-    "gemini-1.5-flash",
-    "gemini-2.5-pro",
-    "gemini-1.5-pro"
+    "gemini-2.0-flash"
 ]
+MODEL_CANDIDATES = list(dict.fromkeys(MODEL_CANDIDATES))
+
+_cached_client = None
 
 def get_genai_client():
+    global _cached_client
+    if _cached_client is not None:
+        return _cached_client
+
     api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
     if api_key:
         try:
-            return genai.Client(api_key=api_key)
+            _cached_client = genai.Client(api_key=api_key)
+            return _cached_client
         except Exception as e:
             print(f"[Backend] Error con API key: {e}")
+
+    projects_to_try = []
     try:
-        return genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
-    except Exception as e:
-        print(f"[Backend] Error iniciando genai.Client(vertexai=True): {e}")
+        import google.auth
+        _, auth_proj = google.auth.default()
+        if auth_proj and auth_proj not in projects_to_try:
+            projects_to_try.append(auth_proj)
+    except Exception:
+        pass
+
+    if os.getenv("PROJECT_ID") and os.getenv("PROJECT_ID") not in projects_to_try:
+        projects_to_try.append(os.getenv("PROJECT_ID"))
+
+    for fallback in ["cymbal-bus-showcase", "cloud-summit-mx"]:
+        if fallback not in projects_to_try:
+            projects_to_try.append(fallback)
+
+    for proj in projects_to_try:
+        try:
+            client = genai.Client(vertexai=True, project=proj, location=LOCATION)
+            _cached_client = client
+            print(f"[Backend] Vertex AI iniciado exitosamente en {proj} con endpoint {LOCATION}")
+            return _cached_client
+        except Exception as e:
+            print(f"[Backend] Error iniciando Vertex AI con {proj}: {e}")
+
     try:
-        return genai.Client()
+        _cached_client = genai.Client()
+        return _cached_client
     except Exception as e:
         print(f"[Backend] Error iniciando genai.Client(): {e}")
         return None
@@ -83,6 +124,33 @@ SAMPLE_TRENDS_RETAIL = [
     {"categoria_o_producto": "Hogar", "tendencia": "Baja (-8%)", "indice_busqueda": 38, "regiones_top": "Centro del País", "motivo_tendencia": "Fin de temporada de remodelaciones residenciales"},
     {"categoria_o_producto": "Línea Blanca", "tendencia": "Baja Estacional (-12%)", "indice_busqueda": 42, "regiones_top": "Norte del País", "motivo_tendencia": "Descenso estacional post ola de calor"}
 ]
+
+GENERAL_SYSTEM_INSTRUCTION = """Eres el Asistente Concierge Inteligente del Google Cloud Summit México.
+Tu función es orientar a los asistentes y directivos sobre la agenda del evento, las capacidades de Google Cloud y Vertex AI, y conectarlos con los 3 Agentes Especializados de Demostración:
+1. 🚚 Agente de Logística y Cadena de Suministro (Torre de Control de Transporte Terrestre, monitoreo de flotas en tiempo real, detección de bloqueos carreteros y re-enrutamiento optimizado en México).
+2. 🛒 Agente de Retail y Marketing Estratégico (Detección de caídas en ventas, cruce con Google Trends y campañas hiper-personalizadas).
+3. 💳 Agente de Fintech y Banca Patrimonial (Prevención de abandono de clientes / Churn con BigQuery ML y ofertas Next-Best-Action).
+
+INSTRUCCIONES CLAVE:
+- Responde de forma cálida, ejecutiva, profesional y concisa en Markdown.
+- Cuando la consulta del usuario se relacione con alguno de los tres sectores, ofrece un resumen de alto nivel y sugiere interactuar directamente con el Agente Especializado correspondiente.
+"""
+
+RETAIL_SYSTEM_INSTRUCTION = f"""Eres el Copiloto Estratégico de Retail y Marketing impulsado por Gemini para directivos en México.
+Tu objetivo es identificar caídas en ventas y cruzarlas con tendencias del mercado para proponer campañas hiper-personalizadas y optimizar inventarios.
+
+DATOS DE VENTAS E-COMMERCE:
+{json.dumps(SAMPLE_VENTAS_RETAIL, indent=2, ensure_ascii=False)}
+
+TENDENCIAS DE MERCADO (GOOGLE TRENDS):
+{json.dumps(SAMPLE_TRENDS_RETAIL, indent=2, ensure_ascii=False)}
+
+REGLAS DE FORMATO (ESTRICTAS):
+- Responde siempre en Markdown estructurado, limpio y visualmente atractivo.
+- Usa emojis estratégicamente (📉 caídas, 📈 alzas, 🎯 audiencias, 🚀 campañas).
+- Destaca cifras en **negritas** y con formato monetario ($ MXN).
+- Sé muy ejecutivo, analítico y directo al grano.
+"""
 
 # Cargar Dataset Maestro Local de Logística
 LOGISTICA_DATA_FILE = os.path.join(os.path.dirname(__file__), "..", "frontend", "data", "logistica_data.json")
@@ -277,8 +345,9 @@ def chat_general(request: ChatRequest):
                 
                 agente_sugerido = detectar_agente_sugerido(user_message, response.text or "")
                 
+                res_text = (response.text or "").replace('\\r\\n', '\n').replace('\\n', '\n')
                 return {
-                    "response": response.text,
+                    "response": res_text,
                     "sources": sources,
                     "agente_sugerido": agente_sugerido
                 }
@@ -310,7 +379,8 @@ def chat_retail(request: ChatRequest):
                     )
                 chat = chat_sessions_retail[session_id]
                 response = chat.send_message(user_message)
-                return {"response": response.text}
+                res_text = (response.text or "").replace('\\r\\n', '\n').replace('\\n', '\n')
+                return {"response": res_text}
             except Exception as e:
                 print(f"[Backend] Error con modelo {model_name} en chat_retail: {e}")
                 if session_id in chat_sessions_retail:
@@ -358,9 +428,11 @@ def chat_logistica(request: ChatRequest):
                 action_payload = extract_action_payload(raw_text)
                 
                 clean_text = re.sub(r'```json_action[\s\S]*?```', '', raw_text).strip()
+                clean_text = clean_text.replace('\\r\\n', '\n').replace('\\n', '\n')
+                final_text = clean_text if clean_text else raw_text.replace('\\r\\n', '\n').replace('\\n', '\n')
                 
                 return {
-                    "response": clean_text if clean_text else raw_text,
+                    "response": final_text,
                     "action_payload": action_payload
                 }
             except Exception as e:
@@ -399,7 +471,8 @@ def chat_fintech(request: ChatRequest):
                     )
                 chat = chat_sessions_fintech[session_id]
                 response = chat.send_message(user_message)
-                return {"response": response.text}
+                res_text = (response.text or "").replace('\\r\\n', '\n').replace('\\n', '\n')
+                return {"response": res_text}
             except Exception as e:
                 print(f"[Backend] Error con modelo {model_name} en chat_fintech: {e}")
                 if session_id in chat_sessions_fintech:

@@ -378,7 +378,15 @@ const HomeView = {
       return 'mdi-arrow-right';
     },
     formatResponse(text) {
-      return marked.parse(text);
+      if (!text) return '';
+      let cleaned = String(text)
+        .replace(/\\r\\n/g, '\n')
+        .replace(/\\n/g, '\n')
+        .replace(/\\r/g, '');
+      let html = marked.parse(cleaned);
+      return html
+        .replace(/<table>/g, '<div class="table-container-responsive"><table>')
+        .replace(/<\/table>/g, '</table></div>');
     }
   }
 };

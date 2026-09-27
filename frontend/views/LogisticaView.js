@@ -307,9 +307,21 @@ const LogisticaView = {
                               <v-icon start size="16">mdi-road-variant</v-icon>
                               Marcar Alerta como Finalizada (Reabrir Ruta 57D)
                             </v-btn>
-                            <v-chip v-else color="success" size="small" variant="flat" class="font-weight-bold">
-                              <v-icon start size="14">mdi-check-circle</v-icon> Vía Despejada • Ruta 57D Activa
-                            </v-chip>
+                            <template v-else>
+                              <v-chip color="success" size="small" variant="flat" class="font-weight-bold">
+                                <v-icon start size="14">mdi-check-circle</v-icon> Vía Despejada • Ruta 57D Activa
+                              </v-chip>
+                              <v-btn
+                                size="small"
+                                color="#EA4335"
+                                variant="flat"
+                                class="text-white text-capitalize font-weight-bold"
+                                @click="reactivateAlert()"
+                              >
+                                <v-icon start size="16">mdi-alert-octagon</v-icon>
+                                Reactivar Alerta
+                              </v-btn>
+                            </template>
                           </template>
                         </div>
                       </div>
@@ -465,7 +477,8 @@ const LogisticaView = {
                         </v-chip>
                       </div>
                       <v-btn size="small" variant="text" color="primary" class="text-capitalize font-weight-bold" @click="askLogisticaPrompt('Analiza el estatus de despacho e inventario Plan B en ' + selectedWarehouse.nombre)">
-                        Consultar al Copiloto
+                        <v-icon start size="16">mdi-chat-processing-outline</v-icon>
+                        Consultar Agente de Logistica
                       </v-btn>
                     </div>
                   </v-card>
@@ -563,7 +576,7 @@ const LogisticaView = {
                           {{ (selectedAlert.estado === 'Resuelta' || roadblockCleared) ? 'mdi-check-all' : (rerouteApproved ? 'mdi-lock-open-variant' : 'mdi-alert-circle-outline') }}
                         </v-icon>
                         <span v-if="selectedAlert.estado === 'Resuelta' || roadblockCleared">
-                          <b>Estatus Final:</b> Bloqueo levantado. Las nuevas unidades utilizan la ruta troncal original 57D. Pin conservado para registro histórico.
+                          <b>Paso 3 (Ciclo Demo):</b> Vía liberada y flujo regular restaurado. Puedes reactivar la alerta en cualquier momento para reiniciar la simulación del bloqueo sin recargar la página.
                         </span>
                         <span v-else-if="rerouteApproved">
                           <b>Paso 2 (Desbloqueado para Demo):</b> Con la ruta despejada y la flota en desvío por 45D, puedes marcar la alerta como finalizada cuando la Guardia Nacional libere la vía.
@@ -601,9 +614,21 @@ const LogisticaView = {
                             <v-icon start size="16">mdi-road-variant</v-icon>
                             Marcar Alerta como Finalizada (Reabrir Ruta 57D)
                           </v-btn>
-                          <v-chip v-else color="success" size="small" variant="flat" class="font-weight-bold">
-                            <v-icon start size="14">mdi-check-circle</v-icon> Alerta Finalizada • Ruta 57D Reabierta
-                          </v-chip>
+                          <template v-else>
+                            <v-chip color="success" size="small" variant="flat" class="font-weight-bold">
+                              <v-icon start size="14">mdi-check-circle</v-icon> Alerta Finalizada • Ruta 57D Reabierta
+                            </v-chip>
+                            <v-btn
+                              size="small"
+                              color="#EA4335"
+                              variant="flat"
+                              class="text-white text-capitalize font-weight-bold"
+                              @click="reactivateAlert(selectedAlert)"
+                            >
+                              <v-icon start size="16">mdi-alert-octagon</v-icon>
+                              Reactivar Alerta (Reiniciar Bloqueo)
+                            </v-btn>
+                          </template>
                         </template>
 
                         <v-btn
@@ -613,7 +638,8 @@ const LogisticaView = {
                           class="text-capitalize font-weight-bold"
                           @click="askLogisticaPrompt('Explica el estado de la Carretera 57D y cómo se gestionan los nuevos transportes tras el levantamiento del bloqueo.')"
                         >
-                          Consultar al Copiloto
+                          <v-icon start size="16">mdi-chat-processing-outline</v-icon>
+                          Consultar Agente de Logistica
                         </v-btn>
                       </div>
                     </div>
@@ -675,7 +701,7 @@ const LogisticaView = {
               </div>
               <div v-if="loading" class="chat-bubble-ai" style="border-left: 4px solid #4285F4; clear: both;">
                 <v-progress-circular indeterminate color="#4285F4" size="18" class="mr-2"></v-progress-circular>
-                Analizando red logística nacional y evaluando desvío de flota...
+                Analizando red de logistica nacional...
               </div>
             </v-card-text>
 
@@ -1104,7 +1130,8 @@ const LogisticaView = {
                 <b>Ruta:</b> ${alert.ruta_nombre}<br>
                 <b>Segmento:</b> ${alert.segmento}<br>
                 <b>Estatus:</b> Tránsito regular restablecido por Guardia Nacional.<br>
-                <b style="color: #137333;">Nuevos transportes:</b> Circulando por ruta original 57D.
+                <b style="color: #137333;">Nuevos transportes:</b> Circulando por ruta original 57D.<br>
+                <span style="color: #c5221f; font-weight: 600; font-size: 10.5px;">Clic para abrir panel o reactivar alerta para demo</span>
               </div>
             </div>
           `;
@@ -1932,6 +1959,159 @@ const LogisticaView = {
       }, 7000);
     },
 
+    // REACTIVACIÓN DE ALERTA: RESTABLECER ESTADO ORIGINAL DE BLOQUEO PARA REPETIR DEMO
+    reactivateAlert(targetAlert) {
+      this.roadblockCleared = false;
+      this.rerouteApproved = false;
+      this.reroutingAnimation = false;
+
+      // 1. Restaurar alerta ALT-57D-BLOQUEO a su estado crítico original
+      const alert = targetAlert || this.selectedAlert || (this.masterData.alerts || []).find(a => a.id === 'ALT-57D-BLOQUEO');
+      if (alert) {
+        alert.estado = 'Activa';
+        alert.tipo_incidencia = 'Bloqueo Carretero por Manifestación y Obras';
+        alert.descripcion = 'Cierre total en ambos sentidos en el Km 182 del tramo Querétaro - San Luis Potosí. Tiempo estimado de resolución indefinido.';
+        alert.icono = 'mdi-alert-octagon';
+        alert.color = '#EA4335';
+        alert.severidad = 'Crítica';
+        alert.retraso_estimado_hrs = 8.0;
+        alert.impacto_financiero_usd = 54000;
+        alert.vehiculos_afectados_ids = ['TRK-302', 'TRK-303', 'TRK-304'];
+      }
+
+      // 2. Restaurar corredor troncal 57D a estado Disrumpido
+      const route57 = (this.masterData.routes || []).find(r => r.id === 'RUTA-CDMX-MTY');
+      if (route57) {
+        route57.estado = 'Disrumpida';
+        route57.estado_motivo = 'Bloqueo carretero y obras en Km 182 Querétaro - SLP';
+        route57.color = '#EA4335';
+        route57.dashArray = '6, 6';
+        if (route57.alternativa) {
+          this.activeConsideration = {
+            ...route57.alternativa,
+            ruta_origen_id: route57.id,
+            ruta_origen_nombre: route57.nombre
+          };
+        }
+      }
+
+      // 3. Restaurar las 3 unidades retenidas en Km 182 (TRK-302, TRK-303, TRK-304)
+      const stuckConfigs = {
+        'TRK-302': {
+          posicion_actual: { lat: 21.1619, lon: -100.9300 },
+          progreso_pct: 48,
+          velocidad_kmh: 0,
+          penalizacion_usd: 24000,
+          estado_transito: 'Detenido al frente del bloqueo carretero en Km 182',
+          estado_operativo: 'Afectado',
+          desvio_tipo: null,
+          segment_index: 4,
+          subStep: 0,
+          queue_delay_ticks: 0,
+          dockTicks: 0
+        },
+        'TRK-303': {
+          posicion_actual: { lat: 21.1350, lon: -100.9150 },
+          progreso_pct: 46,
+          velocidad_kmh: 0,
+          penalizacion_usd: 18000,
+          estado_transito: 'Detenido en fila de espera (Posición 2 detrás de TRK-302)',
+          estado_operativo: 'Afectado',
+          desvio_tipo: null,
+          segment_index: 4,
+          subStep: 0,
+          queue_delay_ticks: 0,
+          dockTicks: 0
+        },
+        'TRK-304': {
+          posicion_actual: { lat: 21.1080, lon: -100.9000 },
+          progreso_pct: 44,
+          velocidad_kmh: 0,
+          penalizacion_usd: 12000,
+          estado_transito: 'Detenido en fila de espera (Posición 3 detrás de TRK-303)',
+          estado_operativo: 'Afectado',
+          desvio_tipo: null,
+          segment_index: 4,
+          subStep: 0,
+          queue_delay_ticks: 0,
+          dockTicks: 0
+        }
+      };
+
+      Object.keys(stuckConfigs).forEach(unitId => {
+        let veh = (this.masterData.vehicles || []).find(v => v.id === unitId);
+        if (veh) {
+          Object.assign(veh, stuckConfigs[unitId]);
+        } else {
+          veh = {
+            id: unitId,
+            nombre: `Transporte ${unitId}`,
+            conductor: unitId === 'TRK-302' ? 'Enrique Salgado' : (unitId === 'TRK-303' ? 'Daniel Treviño' : 'Salvador Garza'),
+            ruta_id: 'RUTA-CDMX-MTY',
+            origen: 'CEDIS Central Cuautitlán (CDMX)',
+            destino: 'CEDIS Macro Norte Apodaca (MTY)',
+            fecha_hora_salida: '27 Sep 2026, 06:00 hrs',
+            eta_llegada: '27 Sep 2026, 16:30 hrs',
+            carga: unitId === 'TRK-302' ? 'Bobinas de Acero Automotriz (34 Tons)' : (unitId === 'TRK-303' ? 'Placas de Acero Rolado' : 'Perfiles Estructurales'),
+            peso_ton: 32,
+            especificaciones: 'Carga pesada industrial con amarre tensor certificado',
+            cliente: unitId === 'TRK-302' ? 'Industrias Metálicas del Norte' : (unitId === 'TRK-303' ? 'Fábricas de Acero Monterrey' : 'Ternium México'),
+            ...stuckConfigs[unitId]
+          };
+          this.masterData.vehicles.push(veh);
+        }
+      });
+
+      // Restaurar demás vehículos en RUTA-CDMX-MTY a tránsito normal sin desvío
+      (this.masterData.vehicles || []).forEach(v => {
+        if (v.ruta_id === 'RUTA-CDMX-MTY' && !['TRK-302', 'TRK-303', 'TRK-304'].includes(v.id)) {
+          if (v.desvio_tipo) {
+            v.desvio_tipo = null;
+          }
+          if (v.estado_operativo === 'Reenrutado') {
+            v.estado_operativo = 'Normal';
+            v.velocidad_kmh = 80;
+            v.estado_transito = 'En tránsito regular hacia Monterrey';
+          }
+        }
+      });
+
+      // 4. Seleccionar la alerta y enfocar corredor
+      this.selectedEntity = 'alert';
+      this.selectedAlert = alert;
+      this.selectedVehicle = null;
+      this.selectedWarehouse = null;
+      this.selectedRoute = route57;
+      this.activeRouteId = route57 ? route57.id : 'RUTA-CDMX-MTY';
+
+      // 5. Refrescar mapa y topología
+      this.renderMasterTopology();
+      if (route57) {
+        this.drawRouteWithPins(route57);
+      }
+
+      // 6. Centrar la cámara en la zona del bloqueo con margen inferior para la tarjeta
+      this.$nextTick(() => {
+        if (this.map && alert) {
+          this.map.invalidateSize();
+          this.map.flyTo([alert.lat, alert.lon], 8, { duration: 0.6 });
+        }
+      });
+
+      // 7. Notificación y mensaje de análisis al panel del Agente Copiloto IA
+      this.rerouteSuccessMessage = '🚨 Alerta reactivada: Bloqueo en Km 182 restablecido y 3 unidades en riesgo.';
+
+      this.messages.push({
+        role: 'ai',
+        content: `### 🚨 Alerta Vial Reactivada: Bloqueo Carretero en Km 182 (Carretera 57D)\n\n- **Situación:** Se ha reactivado la simulación de bloqueo vial en el Km 182 del tramo Querétaro - San Luis Potosí.\n- **Flota en Riesgo:** 3 tractocamiones detenidos (\`TRK-302\`, \`TRK-303\`, \`TRK-304\`).\n- **Impacto Económico:** Penalizaciones contractuales por SLA acumulando **$54,000 USD**.\n- **Acción Disponible:** Proceder con el **Paso 1: Aprobar Desvío por Autopista 45D** para repetir la demostración.`
+      });
+      this.scrollToBottom();
+
+      setTimeout(() => {
+        this.rerouteSuccessMessage = '';
+      }, 7000);
+    },
+
     // GENERADOR DE FLUJO CONTROLADO: DESPACHO CONTINUO RESPETANDO CUPO MÁXIMO POR CORREDOR
     spawnContinuousUnit(routeId) {
       const route = (this.masterData.routes || []).find(r => r.id === routeId);
@@ -2073,7 +2253,17 @@ const LogisticaView = {
     },
 
     formatResponse(text) {
-      return marked.parse(text);
+      if (!text) return '';
+      // Normalizar secuencias literales de escape como '\n\n', '\n' o '\r'
+      let cleaned = String(text)
+        .replace(/\\r\\n/g, '\n')
+        .replace(/\\n/g, '\n')
+        .replace(/\\r/g, '');
+      let html = marked.parse(cleaned);
+      // Envolver tablas en contenedor responsivo con scroll y bordes estilizados
+      return html
+        .replace(/<table>/g, '<div class="table-container-responsive"><table>')
+        .replace(/<\/table>/g, '</table></div>');
     }
   }
 };
