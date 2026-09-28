@@ -73,23 +73,134 @@
       "color": "#4285F4",
       "dashArray": null,
       "coordenadas": [
-        [19.6711, -99.1783],
-        [19.9500, -99.5300],
-        [20.3500, -99.9800],
-        [20.5888, -100.3899],
-        [20.6767, -101.3563],
-        [20.5186, -103.2355],
-        [20.6736, -103.3440],
-        [21.1691, -104.1165],
-        [21.5039, -104.8946],
-        [22.8465, -105.7770],
-        [23.2494, -106.4111],
-        [24.8091, -107.3940],
-        [25.7905, -108.9959],
-        [26.8042, -109.4439],
-        [27.4864, -109.9408],
-        [27.9179, -110.8994],
-        [29.0729, -110.9559]
+        [
+          19.6711,
+          -99.1783
+        ],
+        [
+          19.95,
+          -99.53
+        ],
+        [
+          20.35,
+          -99.98
+        ],
+        [
+          20.5888,
+          -100.3899
+        ],
+        [
+          20.6767,
+          -101.3563
+        ],
+        [
+          20.5186,
+          -103.2355
+        ],
+        [
+          20.6736,
+          -103.344
+        ],
+        [
+          21.1691,
+          -104.1165
+        ],
+        [
+          21.5039,
+          -104.8946
+        ],
+        [
+          21.938,
+          -105.104
+        ],
+        [
+          22.45,
+          -105.42
+        ],
+        [
+          22.8465,
+          -105.777
+        ],
+        [
+          23.2,
+          -106.202
+        ],
+        [
+          23.2494,
+          -106.4111
+        ],
+        [
+          23.705,
+          -106.57
+        ],
+        [
+          23.955,
+          -106.885
+        ],
+        [
+          24.425,
+          -107.215
+        ],
+        [
+          24.63,
+          -107.385
+        ],
+        [
+          24.8091,
+          -107.394
+        ],
+        [
+          25.464,
+          -108.082
+        ],
+        [
+          25.568,
+          -108.468
+        ],
+        [
+          25.7905,
+          -108.9959
+        ],
+        [
+          26.395,
+          -109.008
+        ],
+        [
+          26.8042,
+          -109.4439
+        ],
+        [
+          27.4864,
+          -109.9408
+        ],
+        [
+          27.63,
+          -110.267
+        ],
+        [
+          27.951,
+          -110.741
+        ],
+        [
+          27.983,
+          -110.785
+        ],
+        [
+          28.025,
+          -110.867
+        ],
+        [
+          28.452,
+          -111.046
+        ],
+        [
+          28.8,
+          -110.958
+        ],
+        [
+          29.0729,
+          -110.9559
+        ]
       ],
       "alerta_id": null,
       "alternativa": null
@@ -102,32 +213,141 @@
       "destino_id": "CEDIS-CDMX",
       "destino_nombre": "CEDIS CDMX (Cuautitlán)",
       "distancia_km": 1310,
-      "tiempo_base_hrs": 16.0,
+      "tiempo_base_hrs": 16,
       "max_unidades": 15,
       "estado": "Normal",
       "estado_motivo": "Condiciones climáticas favorables en Golfo y Altiplano",
       "color": "#4285F4",
       "dashArray": null,
       "coordenadas": [
-        [20.9674, -89.5926],
-        [20.4468, -90.0463],
-        [19.8301, -90.5349],
-        [18.6480, -91.8290],
-        [18.6083, -92.5701],
-        [17.9892, -92.9281],
-        [17.9812, -93.3800],
-        [18.1344, -94.4600],
-        [18.1797, -94.5515],
-        [18.0062, -95.2741],
-        [18.4324, -95.7314],
-        [18.8497, -96.9536],
-        [18.8537, -97.1004],
-        [18.9138, -97.4326],
-        [19.0414, -98.2063],
-        [19.2844, -98.4347],
-        [19.3486, -98.6811],
-        [19.4326, -99.1332],
-        [19.6711, -99.1783]
+        [
+          20.9674,
+          -89.5926
+        ],
+        [
+          20.6065,
+          -89.9681
+        ],
+        [
+          20.365,
+          -90.05
+        ],
+        [
+          20.036,
+          -90.22
+        ],
+        [
+          19.8301,
+          -90.5349
+        ],
+        [
+          19.64,
+          -90.69
+        ],
+        [
+          19.35,
+          -90.72
+        ],
+        [
+          19.183,
+          -90.9
+        ],
+        [
+          18.97,
+          -91.18
+        ],
+        [
+          18.78,
+          -91.49
+        ],
+        [
+          18.765,
+          -91.56
+        ],
+        [
+          18.648,
+          -91.829
+        ],
+        [
+          18.636,
+          -91.823
+        ],
+        [
+          18.618,
+          -92.11
+        ],
+        [
+          18.651,
+          -92.42
+        ],
+        [
+          18.586,
+          -92.568
+        ],
+        [
+          18.535,
+          -92.638
+        ],
+        [
+          18.211,
+          -92.822
+        ],
+        [
+          17.9892,
+          -92.9281
+        ],
+        [
+          17.9812,
+          -93.38
+        ],
+        [
+          18.115,
+          -94.475
+        ],
+        [
+          18.005,
+          -94.55
+        ],
+        [
+          18.0062,
+          -95.2741
+        ],
+        [
+          18.4324,
+          -95.7314
+        ],
+        [
+          18.8497,
+          -96.9536
+        ],
+        [
+          18.8537,
+          -97.1004
+        ],
+        [
+          18.9138,
+          -97.4326
+        ],
+        [
+          19.0414,
+          -98.2063
+        ],
+        [
+          19.2844,
+          -98.4347
+        ],
+        [
+          19.3486,
+          -98.6811
+        ],
+        [
+          19.4326,
+          -99.1332
+        ],
+        [
+          19.6711,
+          -99.1783
+        ]
       ],
       "alerta_id": null,
       "alternativa": null
@@ -147,64 +367,196 @@
       "color": "#EA4335",
       "dashArray": "6, 6",
       "coordenadas": [
-        [19.6711, -99.1783],
-        [19.9500, -99.5300],
-        [20.3500, -99.9800],
-        [20.5888, -100.3899],
-        [21.1619, -100.9300],
-        [21.8000, -100.8500],
-        [22.1565, -100.9855],
-        [23.6496, -100.6441],
-        [25.4232, -100.9922],
-        [25.6866, -100.3161],
-        [25.7785, -100.1876]
+        [
+          19.6711,
+          -99.1783
+        ],
+        [
+          19.95,
+          -99.53
+        ],
+        [
+          20.35,
+          -99.98
+        ],
+        [
+          20.5888,
+          -100.3899
+        ],
+        [
+          21.1619,
+          -100.93
+        ],
+        [
+          21.8,
+          -100.85
+        ],
+        [
+          22.1565,
+          -100.9855
+        ],
+        [
+          23.6496,
+          -100.6441
+        ],
+        [
+          25.4232,
+          -100.9922
+        ],
+        [
+          25.6866,
+          -100.3161
+        ],
+        [
+          25.7785,
+          -100.1876
+        ]
       ],
       "alerta_id": "ALT-57D-BLOQUEO",
       "alternativa": {
         "id": "RUTA-57D-ALT",
         "nombre": "Estrategia Dual de Desvío Autopista 45D (Bloqueo Km 182 + Desvío Anticipado CDMX)",
         "distancia_km": 1040,
-        "tiempo_estimado_hrs": 12.0,
+        "tiempo_estimado_hrs": 12,
         "color": "#34A853",
         "dashArray": "4, 6",
         "coordenadas_bloqueo": [
-          [21.1619, -100.9300],
-          [21.2980, -100.5160],
-          [21.4780, -101.2160],
-          [21.8670, -101.5900],
-          [21.8853, -102.2916],
-          [22.7709, -102.5832],
-          [23.9000, -102.0000],
-          [25.4232, -100.9922],
-          [25.6866, -100.3161],
-          [25.7785, -100.1876]
+          [
+            21.1619,
+            -100.93
+          ],
+          [
+            21.298,
+            -100.516
+          ],
+          [
+            21.478,
+            -101.216
+          ],
+          [
+            21.867,
+            -101.59
+          ],
+          [
+            21.8853,
+            -102.2916
+          ],
+          [
+            22.7709,
+            -102.5832
+          ],
+          [
+            23.9,
+            -102
+          ],
+          [
+            25.4232,
+            -100.9922
+          ],
+          [
+            25.6866,
+            -100.3161
+          ],
+          [
+            25.7785,
+            -100.1876
+          ]
         ],
         "coordenadas_anticipado": [
-          [19.6711, -99.1783],
-          [19.9500, -99.5300],
-          [20.3500, -99.9800],
-          [20.5888, -100.3899],
-          [20.5287, -100.8142],
-          [20.7214, -101.3468],
-          [20.9167, -101.4000],
-          [21.8853, -102.2916],
-          [22.7709, -102.5832],
-          [23.9000, -102.0000],
-          [25.4232, -100.9922],
-          [25.6866, -100.3161],
-          [25.7785, -100.1876]
+          [
+            19.6711,
+            -99.1783
+          ],
+          [
+            19.95,
+            -99.53
+          ],
+          [
+            20.35,
+            -99.98
+          ],
+          [
+            20.5888,
+            -100.3899
+          ],
+          [
+            20.5287,
+            -100.8142
+          ],
+          [
+            20.7214,
+            -101.3468
+          ],
+          [
+            20.9167,
+            -101.4
+          ],
+          [
+            21.8853,
+            -102.2916
+          ],
+          [
+            22.7709,
+            -102.5832
+          ],
+          [
+            23.9,
+            -102
+          ],
+          [
+            25.4232,
+            -100.9922
+          ],
+          [
+            25.6866,
+            -100.3161
+          ],
+          [
+            25.7785,
+            -100.1876
+          ]
         ],
         "coordenadas": [
-          [21.1619, -100.9300],
-          [21.2980, -100.5160],
-          [21.4780, -101.2160],
-          [21.8670, -101.5900],
-          [21.8853, -102.2916],
-          [22.7709, -102.5832],
-          [23.9000, -102.0000],
-          [25.4232, -100.9922],
-          [25.6866, -100.3161],
-          [25.7785, -100.1876]
+          [
+            21.1619,
+            -100.93
+          ],
+          [
+            21.298,
+            -100.516
+          ],
+          [
+            21.478,
+            -101.216
+          ],
+          [
+            21.867,
+            -101.59
+          ],
+          [
+            21.8853,
+            -102.2916
+          ],
+          [
+            22.7709,
+            -102.5832
+          ],
+          [
+            23.9,
+            -102
+          ],
+          [
+            25.4232,
+            -100.9922
+          ],
+          [
+            25.6866,
+            -100.3161
+          ],
+          [
+            25.7785,
+            -100.1876
+          ]
         ],
         "consideraciones": {
           "delta_tiempo": "+1.5 hrs de tránsito vs +8.0 hrs detenido en bloqueo",
@@ -228,7 +580,10 @@
       "destino": "CEDIS Noroeste Hermosillo (Sonora)",
       "fecha_hora_salida": "27 Sep 2026, 05:00 hrs",
       "eta_llegada": "28 Sep 2026, 03:30 hrs",
-      "posicion_actual": { "lat": 20.5888, "lon": -100.3899 },
+      "posicion_actual": {
+        "lat": 20.5888,
+        "lon": -100.3899
+      },
       "progreso_pct": 18,
       "velocidad_kmh": 85,
       "carga": "Microchips y Sensores Industriales",
@@ -250,7 +605,10 @@
       "destino": "CEDIS Noroeste Hermosillo (Sonora)",
       "fecha_hora_salida": "26 Sep 2026, 20:00 hrs",
       "eta_llegada": "27 Sep 2026, 18:30 hrs",
-      "posicion_actual": { "lat": 21.5039, "lon": -104.8946 },
+      "posicion_actual": {
+        "lat": 21.5039,
+        "lon": -104.8946
+      },
       "progreso_pct": 42,
       "velocidad_kmh": 82,
       "carga": "Módulos Eléctricos EV y Baterías de Litio",
@@ -272,7 +630,10 @@
       "destino": "CEDIS Noroeste Hermosillo (Sonora)",
       "fecha_hora_salida": "26 Sep 2026, 14:00 hrs",
       "eta_llegada": "27 Sep 2026, 12:30 hrs",
-      "posicion_actual": { "lat": 24.8091, "lon": -107.3940 },
+      "posicion_actual": {
+        "lat": 24.8091,
+        "lon": -107.394
+      },
       "progreso_pct": 68,
       "velocidad_kmh": 88,
       "carga": "Dispositivos Médicos Refrigerados (4°C)",
@@ -283,7 +644,7 @@
       "estado_transito": "En tránsito normal por Culiacán hacia Los Mochis",
       "estado_operativo": "Normal",
       "icono": "mdi-truck-fast",
-      "segment_index": 11
+      "segment_index": 18
     },
     {
       "id": "TRK-104",
@@ -294,7 +655,10 @@
       "destino": "CEDIS Noroeste Hermosillo (Sonora)",
       "fecha_hora_salida": "26 Sep 2026, 08:00 hrs",
       "eta_llegada": "27 Sep 2026, 06:30 hrs",
-      "posicion_actual": { "lat": 27.9179, "lon": -110.8994 },
+      "posicion_actual": {
+        "lat": 28.025,
+        "lon": -110.867
+      },
       "progreso_pct": 88,
       "velocidad_kmh": 90,
       "carga": "Componentes Aeroespaciales de Titanio",
@@ -305,7 +669,7 @@
       "estado_transito": "Aproximándose a Hermosillo (tramo Guaymas)",
       "estado_operativo": "Normal",
       "icono": "mdi-truck-fast",
-      "segment_index": 15
+      "segment_index": 28
     },
     {
       "id": "TRK-201",
@@ -316,7 +680,10 @@
       "destino": "CEDIS Central Cuautitlán (CDMX)",
       "fecha_hora_salida": "27 Sep 2026, 06:00 hrs",
       "eta_llegada": "27 Sep 2026, 22:00 hrs",
-      "posicion_actual": { "lat": 19.8301, "lon": -90.5349 },
+      "posicion_actual": {
+        "lat": 19.8301,
+        "lon": -90.5349
+      },
       "progreso_pct": 15,
       "velocidad_kmh": 80,
       "carga": "Miel Orgánica de Exportación & Derivados",
@@ -327,7 +694,7 @@
       "estado_transito": "En tránsito por Campeche rumbo a Carmen",
       "estado_operativo": "Normal",
       "icono": "mdi-truck-fast",
-      "segment_index": 2
+      "segment_index": 4
     },
     {
       "id": "TRK-202",
@@ -338,7 +705,10 @@
       "destino": "CEDIS Central Cuautitlán (CDMX)",
       "fecha_hora_salida": "26 Sep 2026, 23:00 hrs",
       "eta_llegada": "27 Sep 2026, 15:00 hrs",
-      "posicion_actual": { "lat": 17.9892, "lon": -92.9281 },
+      "posicion_actual": {
+        "lat": 17.9892,
+        "lon": -92.9281
+      },
       "progreso_pct": 38,
       "velocidad_kmh": 84,
       "carga": "Productos Cárnicos y Avícolas Congelados (-18°C)",
@@ -349,7 +719,7 @@
       "estado_transito": "En tránsito regular pasando Villahermosa",
       "estado_operativo": "Normal",
       "icono": "mdi-truck-fast",
-      "segment_index": 5
+      "segment_index": 18
     },
     {
       "id": "TRK-203",
@@ -360,7 +730,10 @@
       "destino": "CEDIS Central Cuautitlán (CDMX)",
       "fecha_hora_salida": "26 Sep 2026, 18:00 hrs",
       "eta_llegada": "27 Sep 2026, 10:00 hrs",
-      "posicion_actual": { "lat": 18.0062, "lon": -95.2741 },
+      "posicion_actual": {
+        "lat": 18.0062,
+        "lon": -95.2741
+      },
       "progreso_pct": 62,
       "velocidad_kmh": 82,
       "carga": "Polietileno de Alta Densidad y Resinas",
@@ -371,7 +744,7 @@
       "estado_transito": "En tránsito autopista Acayucan - Cosamaloapan",
       "estado_operativo": "Normal",
       "icono": "mdi-truck-fast",
-      "segment_index": 9
+      "segment_index": 22
     },
     {
       "id": "TRK-204",
@@ -382,7 +755,10 @@
       "destino": "CEDIS Central Cuautitlán (CDMX)",
       "fecha_hora_salida": "26 Sep 2026, 12:00 hrs",
       "eta_llegada": "27 Sep 2026, 04:00 hrs",
-      "posicion_actual": { "lat": 19.0414, "lon": -98.2063 },
+      "posicion_actual": {
+        "lat": 19.0414,
+        "lon": -98.2063
+      },
       "progreso_pct": 85,
       "velocidad_kmh": 86,
       "carga": "Insumos de Empaque & Retail Nacional",
@@ -393,7 +769,7 @@
       "estado_transito": "Ascendiendo por Puebla rumbo a Río Frío y CDMX",
       "estado_operativo": "Normal",
       "icono": "mdi-truck-fast",
-      "segment_index": 14
+      "segment_index": 27
     },
     {
       "id": "TRK-301",
@@ -404,7 +780,10 @@
       "destino": "CEDIS Macro Norte Apodaca (MTY)",
       "fecha_hora_salida": "27 Sep 2026, 08:30 hrs",
       "eta_llegada": "27 Sep 2026, 19:00 hrs",
-      "posicion_actual": { "lat": 20.5888, "lon": -100.3899 },
+      "posicion_actual": {
+        "lat": 20.5888,
+        "lon": -100.3899
+      },
       "progreso_pct": 28,
       "velocidad_kmh": 84,
       "carga": "Autopartes de Estampado de Precisión",
@@ -426,7 +805,10 @@
       "destino": "CEDIS Macro Norte Apodaca (MTY)",
       "fecha_hora_salida": "27 Sep 2026, 06:00 hrs",
       "eta_llegada": "27 Sep 2026, 16:30 hrs",
-      "posicion_actual": { "lat": 21.1619, "lon": -100.9300 },
+      "posicion_actual": {
+        "lat": 21.1619,
+        "lon": -100.93
+      },
       "progreso_pct": 48,
       "velocidad_kmh": 0,
       "carga": "Bobinas de Acero Automotriz (34 Tons)",
@@ -448,7 +830,10 @@
       "destino": "CEDIS Macro Norte Apodaca (MTY)",
       "fecha_hora_salida": "27 Sep 2026, 06:15 hrs",
       "eta_llegada": "27 Sep 2026, 16:45 hrs",
-      "posicion_actual": { "lat": 21.1350, "lon": -100.9150 },
+      "posicion_actual": {
+        "lat": 21.135,
+        "lon": -100.915
+      },
       "progreso_pct": 46,
       "velocidad_kmh": 0,
       "carga": "Placas de Acero Rolado y Perfiles",
@@ -470,7 +855,10 @@
       "destino": "CEDIS Macro Norte Apodaca (MTY)",
       "fecha_hora_salida": "27 Sep 2026, 06:30 hrs",
       "eta_llegada": "27 Sep 2026, 17:00 hrs",
-      "posicion_actual": { "lat": 21.1080, "lon": -100.9000 },
+      "posicion_actual": {
+        "lat": 21.108,
+        "lon": -100.9
+      },
       "progreso_pct": 44,
       "velocidad_kmh": 0,
       "carga": "Perfiles Estructurales y Vigueta",
@@ -492,7 +880,10 @@
       "destino": "CEDIS Macro Norte Apodaca (MTY)",
       "fecha_hora_salida": "27 Sep 2026, 08:45 hrs",
       "eta_llegada": "27 Sep 2026, 19:15 hrs",
-      "posicion_actual": { "lat": 20.3500, "lon": -99.9800 },
+      "posicion_actual": {
+        "lat": 20.35,
+        "lon": -99.98
+      },
       "progreso_pct": 20,
       "velocidad_kmh": 82,
       "carga": "Motores de Lavadoras y Ensambles Línea Blanca",
@@ -514,7 +905,10 @@
       "destino": "CEDIS Macro Norte Apodaca (MTY)",
       "fecha_hora_salida": "27 Sep 2026, 09:15 hrs",
       "eta_llegada": "27 Sep 2026, 19:45 hrs",
-      "posicion_actual": { "lat": 19.9500, "lon": -99.5300 },
+      "posicion_actual": {
+        "lat": 19.95,
+        "lon": -99.53
+      },
       "progreso_pct": 12,
       "velocidad_kmh": 80,
       "carga": "Resinas Plásticas Industriales y Polímeros",
@@ -536,7 +930,10 @@
       "destino": "CEDIS Macro Norte Apodaca (MTY)",
       "fecha_hora_salida": "27 Sep 2026, 09:40 hrs",
       "eta_llegada": "27 Sep 2026, 20:10 hrs",
-      "posicion_actual": { "lat": 19.6711, "lon": -99.1783 },
+      "posicion_actual": {
+        "lat": 19.6711,
+        "lon": -99.1783
+      },
       "progreso_pct": 3,
       "velocidad_kmh": 68,
       "carga": "Semiconductores y Módulos ECU de Precisión",
@@ -558,7 +955,10 @@
       "destino": "CEDIS Macro Norte Apodaca (MTY)",
       "fecha_hora_salida": "27 Sep 2026, 03:00 hrs",
       "eta_llegada": "27 Sep 2026, 13:30 hrs",
-      "posicion_actual": { "lat": 23.6496, "lon": -100.6441 },
+      "posicion_actual": {
+        "lat": 23.6496,
+        "lon": -100.6441
+      },
       "progreso_pct": 74,
       "velocidad_kmh": 88,
       "carga": "Componentes HVAC y Compresores de Refrigeración",
@@ -580,7 +980,10 @@
       "destino": "CEDIS Macro Norte Apodaca (MTY)",
       "fecha_hora_salida": "27 Sep 2026, 01:00 hrs",
       "eta_llegada": "27 Sep 2026, 11:30 hrs",
-      "posicion_actual": { "lat": 25.4232, "lon": -100.9922 },
+      "posicion_actual": {
+        "lat": 25.4232,
+        "lon": -100.9922
+      },
       "progreso_pct": 90,
       "velocidad_kmh": 82,
       "carga": "Arneses Automotrices de Alto Calibre",
@@ -601,10 +1004,10 @@
       "ruta_nombre": "Corredor Central 57D (CDMX ➔ MTY)",
       "segmento": "Km 182 Tramo Querétaro - San Luis Potosí",
       "lat": 21.1619,
-      "lon": -100.9300,
+      "lon": -100.93,
       "tipo_incidencia": "Bloqueo Carretero y Obras Mayores",
       "severidad": "Crítica",
-      "retraso_estimado_hrs": 8.0,
+      "retraso_estimado_hrs": 8,
       "impacto_financiero_usd": 54000,
       "vehiculos_afectados_ids": [
         "TRK-302",

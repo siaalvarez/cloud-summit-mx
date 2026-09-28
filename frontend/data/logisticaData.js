@@ -85,13 +85,28 @@ const LOGISTICA_MASTER_DATA = {
         [20.6736, -103.3440],
         [21.1691, -104.1165],
         [21.5039, -104.8946],
+        [21.9380, -105.1040],
+        [22.4500, -105.4200],
         [22.8465, -105.7770],
+        [23.2000, -106.2020],
         [23.2494, -106.4111],
+        [23.7050, -106.5700],
+        [23.9550, -106.8850],
+        [24.4250, -107.2150],
+        [24.6300, -107.3850],
         [24.8091, -107.3940],
+        [25.4640, -108.0820],
+        [25.5680, -108.4680],
         [25.7905, -108.9959],
+        [26.3950, -109.0080],
         [26.8042, -109.4439],
         [27.4864, -109.9408],
-        [27.9179, -110.8994],
+        [27.6300, -110.2670],
+        [27.9510, -110.7410],
+        [27.9830, -110.7850],
+        [28.0250, -110.8670],
+        [28.4520, -111.0460],
+        [28.8000, -110.9580],
         [29.0729, -110.9559]
       ],
       alerta_id: null,
@@ -113,14 +128,27 @@ const LOGISTICA_MASTER_DATA = {
       dashArray: null,
       coordenadas: [
         [20.9674, -89.5926],
-        [20.4468, -90.0463],
+        [20.6065, -89.9681],
+        [20.3650, -90.0500],
+        [20.0360, -90.2200],
         [19.8301, -90.5349],
+        [19.6400, -90.6900],
+        [19.3500, -90.7200],
+        [19.1830, -90.9000],
+        [18.9700, -91.1800],
+        [18.7800, -91.4900],
+        [18.7650, -91.5600],
         [18.6480, -91.8290],
-        [18.6083, -92.5701],
+        [18.6360, -91.8230],
+        [18.6180, -92.1100],
+        [18.6510, -92.4200],
+        [18.5860, -92.5680],
+        [18.5350, -92.6380],
+        [18.2110, -92.8220],
         [17.9892, -92.9281],
         [17.9812, -93.3800],
-        [18.1344, -94.4600],
-        [18.1797, -94.5515],
+        [18.1150, -94.4750],
+        [18.0050, -94.5500],
         [18.0062, -95.2741],
         [18.4324, -95.7314],
         [18.8497, -96.9536],
@@ -286,7 +314,7 @@ const LOGISTICA_MASTER_DATA = {
       estado_transito: "En tránsito normal por Culiacán hacia Los Mochis",
       estado_operativo: "Normal",
       icono: "mdi-truck-fast",
-      segment_index: 11
+      segment_index: 18
     },
     {
       id: "TRK-104",
@@ -297,7 +325,7 @@ const LOGISTICA_MASTER_DATA = {
       destino: "CEDIS Noroeste Hermosillo (Sonora)",
       fecha_hora_salida: "26 Sep 2026, 08:00 hrs",
       eta_llegada: "27 Sep 2026, 06:30 hrs",
-      posicion_actual: { lat: 27.9179, lon: -110.8994 },
+      posicion_actual: { lat: 28.0250, lon: -110.8670 },
       progreso_pct: 88,
       velocidad_kmh: 90,
       carga: "Componentes Aeroespaciales de Titanio",
@@ -308,7 +336,7 @@ const LOGISTICA_MASTER_DATA = {
       estado_transito: "Aproximándose a Hermosillo (tramo Guaymas)",
       estado_operativo: "Normal",
       icono: "mdi-truck-fast",
-      segment_index: 15
+      segment_index: 28
     },
     {
       id: "TRK-201",
@@ -330,7 +358,7 @@ const LOGISTICA_MASTER_DATA = {
       estado_transito: "En tránsito por Campeche rumbo a Carmen",
       estado_operativo: "Normal",
       icono: "mdi-truck-fast",
-      segment_index: 2
+      segment_index: 4
     },
     {
       id: "TRK-202",
@@ -352,7 +380,7 @@ const LOGISTICA_MASTER_DATA = {
       estado_transito: "En tránsito regular pasando Villahermosa",
       estado_operativo: "Normal",
       icono: "mdi-truck-fast",
-      segment_index: 5
+      segment_index: 18
     },
     {
       id: "TRK-203",
@@ -374,7 +402,7 @@ const LOGISTICA_MASTER_DATA = {
       estado_transito: "En tránsito autopista Acayucan - Cosamaloapan",
       estado_operativo: "Normal",
       icono: "mdi-truck-fast",
-      segment_index: 9
+      segment_index: 22
     },
     {
       id: "TRK-204",
@@ -396,7 +424,7 @@ const LOGISTICA_MASTER_DATA = {
       estado_transito: "Ascendiendo por Puebla rumbo a Río Frío y CDMX",
       estado_operativo: "Normal",
       icono: "mdi-truck-fast",
-      segment_index: 14
+      segment_index: 27
     },
     {
       id: "TRK-301",
