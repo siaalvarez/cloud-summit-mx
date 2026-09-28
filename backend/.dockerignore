@@ -1,0 +1,13 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+.git
+.gitignore
+tests/
+test_*.py
+main_backup.py
+fix_backend.py

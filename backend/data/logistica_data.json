@@ -1,0 +1,1026 @@
+{
+  "warehouses": [
+    {
+      "id": "CEDIS-CDMX",
+      "nombre": "CEDIS Central Cuautitlán (CDMX)",
+      "ubicacion": "Cuautitlán Izcalli, Edo. Méx.",
+      "lat": 19.6711,
+      "lon": -99.1783,
+      "tipo": "warehouse",
+      "capacidad_m2": 45000,
+      "stock_status": "Optimo",
+      "stock_descripcion": "350 Motores V6, 15,000 SKUs alta rotación",
+      "inventario_plan_b": true,
+      "unidades_disponibles_plan_b": 320,
+      "icono": "mdi-warehouse"
+    },
+    {
+      "id": "CEDIS-MTY",
+      "nombre": "CEDIS Macro Norte Apodaca (MTY)",
+      "ubicacion": "Apodaca, Nuevo León",
+      "lat": 25.7785,
+      "lon": -100.1876,
+      "tipo": "warehouse",
+      "capacidad_m2": 38000,
+      "stock_status": "Optimo",
+      "stock_descripcion": "Stock de Respaldo Inmediato (Plan B)",
+      "inventario_plan_b": true,
+      "unidades_disponibles_plan_b": 450,
+      "icono": "mdi-warehouse"
+    },
+    {
+      "id": "CEDIS-HER",
+      "nombre": "CEDIS Noroeste Hermosillo (HER)",
+      "ubicacion": "Parque Industrial Hermosillo, Sonora",
+      "lat": 29.0729,
+      "lon": -110.9559,
+      "tipo": "warehouse",
+      "capacidad_m2": 32000,
+      "stock_status": "Optimo",
+      "stock_descripcion": "Componentes aeroespaciales, arneses y sensores",
+      "inventario_plan_b": true,
+      "unidades_disponibles_plan_b": 210,
+      "icono": "mdi-warehouse"
+    },
+    {
+      "id": "CEDIS-MID",
+      "nombre": "CEDIS Peninsular Mérida (MID)",
+      "ubicacion": "Periférico Poniente, Mérida, Yucatán",
+      "lat": 20.9674,
+      "lon": -89.5926,
+      "tipo": "warehouse",
+      "capacidad_m2": 29000,
+      "stock_status": "Optimo",
+      "stock_descripcion": "Alimentos refrigerados, miel orgánica e insumos de retail",
+      "inventario_plan_b": true,
+      "unidades_disponibles_plan_b": 180,
+      "icono": "mdi-warehouse"
+    }
+  ],
+  "routes": [
+    {
+      "id": "RUTA-CDMX-HER",
+      "nombre": "Corredor Pacífico 15D (CDMX ➔ Hermosillo)",
+      "origen_id": "CEDIS-CDMX",
+      "origen_nombre": "CEDIS CDMX (Cuautitlán)",
+      "destino_id": "CEDIS-HER",
+      "destino_nombre": "CEDIS Hermosillo (Sonora)",
+      "distancia_km": 1920,
+      "tiempo_base_hrs": 22.5,
+      "max_unidades": 15,
+      "estado": "Normal",
+      "estado_motivo": "Tránsito fluido en Corredor 15D Pacífico",
+      "color": "#4285F4",
+      "dashArray": null,
+      "coordenadas": [
+        [
+          19.6711,
+          -99.1783
+        ],
+        [
+          19.95,
+          -99.53
+        ],
+        [
+          20.35,
+          -99.98
+        ],
+        [
+          20.5888,
+          -100.3899
+        ],
+        [
+          20.6767,
+          -101.3563
+        ],
+        [
+          20.5186,
+          -103.2355
+        ],
+        [
+          20.6736,
+          -103.344
+        ],
+        [
+          21.1691,
+          -104.1165
+        ],
+        [
+          21.5039,
+          -104.8946
+        ],
+        [
+          21.938,
+          -105.104
+        ],
+        [
+          22.45,
+          -105.42
+        ],
+        [
+          22.8465,
+          -105.777
+        ],
+        [
+          23.2,
+          -106.202
+        ],
+        [
+          23.2494,
+          -106.4111
+        ],
+        [
+          23.705,
+          -106.57
+        ],
+        [
+          23.955,
+          -106.885
+        ],
+        [
+          24.425,
+          -107.215
+        ],
+        [
+          24.63,
+          -107.385
+        ],
+        [
+          24.8091,
+          -107.394
+        ],
+        [
+          25.464,
+          -108.082
+        ],
+        [
+          25.568,
+          -108.468
+        ],
+        [
+          25.7905,
+          -108.9959
+        ],
+        [
+          26.395,
+          -109.008
+        ],
+        [
+          26.8042,
+          -109.4439
+        ],
+        [
+          27.4864,
+          -109.9408
+        ],
+        [
+          27.63,
+          -110.267
+        ],
+        [
+          27.951,
+          -110.741
+        ],
+        [
+          27.983,
+          -110.785
+        ],
+        [
+          28.025,
+          -110.867
+        ],
+        [
+          28.452,
+          -111.046
+        ],
+        [
+          28.8,
+          -110.958
+        ],
+        [
+          29.0729,
+          -110.9559
+        ]
+      ],
+      "alerta_id": null,
+      "alternativa": null
+    },
+    {
+      "id": "RUTA-MID-CDMX",
+      "nombre": "Corredor Sureste 180D (Mérida ➔ CDMX)",
+      "origen_id": "CEDIS-MID",
+      "origen_nombre": "CEDIS Mérida (Yucatán)",
+      "destino_id": "CEDIS-CDMX",
+      "destino_nombre": "CEDIS CDMX (Cuautitlán)",
+      "distancia_km": 1310,
+      "tiempo_base_hrs": 16,
+      "max_unidades": 15,
+      "estado": "Normal",
+      "estado_motivo": "Condiciones climáticas favorables en Golfo y Altiplano",
+      "color": "#4285F4",
+      "dashArray": null,
+      "coordenadas": [
+        [
+          20.9674,
+          -89.5926
+        ],
+        [
+          20.6065,
+          -89.9681
+        ],
+        [
+          20.365,
+          -90.05
+        ],
+        [
+          20.036,
+          -90.22
+        ],
+        [
+          19.8301,
+          -90.5349
+        ],
+        [
+          19.64,
+          -90.69
+        ],
+        [
+          19.35,
+          -90.72
+        ],
+        [
+          19.183,
+          -90.9
+        ],
+        [
+          18.97,
+          -91.18
+        ],
+        [
+          18.78,
+          -91.49
+        ],
+        [
+          18.765,
+          -91.56
+        ],
+        [
+          18.648,
+          -91.829
+        ],
+        [
+          18.636,
+          -91.823
+        ],
+        [
+          18.618,
+          -92.11
+        ],
+        [
+          18.651,
+          -92.42
+        ],
+        [
+          18.586,
+          -92.568
+        ],
+        [
+          18.535,
+          -92.638
+        ],
+        [
+          18.211,
+          -92.822
+        ],
+        [
+          17.9892,
+          -92.9281
+        ],
+        [
+          17.9812,
+          -93.38
+        ],
+        [
+          18.115,
+          -94.475
+        ],
+        [
+          18.005,
+          -94.55
+        ],
+        [
+          18.0062,
+          -95.2741
+        ],
+        [
+          18.4324,
+          -95.7314
+        ],
+        [
+          18.8497,
+          -96.9536
+        ],
+        [
+          18.8537,
+          -97.1004
+        ],
+        [
+          18.9138,
+          -97.4326
+        ],
+        [
+          19.0414,
+          -98.2063
+        ],
+        [
+          19.2844,
+          -98.4347
+        ],
+        [
+          19.3486,
+          -98.6811
+        ],
+        [
+          19.4326,
+          -99.1332
+        ],
+        [
+          19.6711,
+          -99.1783
+        ]
+      ],
+      "alerta_id": null,
+      "alternativa": null
+    },
+    {
+      "id": "RUTA-CDMX-MTY",
+      "nombre": "Corredor Central 57D (CDMX ➔ Monterrey)",
+      "origen_id": "CEDIS-CDMX",
+      "origen_nombre": "CEDIS CDMX (Cuautitlán)",
+      "destino_id": "CEDIS-MTY",
+      "destino_nombre": "CEDIS Monterrey (Apodaca)",
+      "distancia_km": 915,
+      "tiempo_base_hrs": 10.5,
+      "max_unidades": 18,
+      "estado": "Disrumpida",
+      "estado_motivo": "Bloqueo carretero y obras en Km 182 Querétaro - SLP",
+      "color": "#EA4335",
+      "dashArray": "6, 6",
+      "coordenadas": [
+        [
+          19.6711,
+          -99.1783
+        ],
+        [
+          19.95,
+          -99.53
+        ],
+        [
+          20.35,
+          -99.98
+        ],
+        [
+          20.5888,
+          -100.3899
+        ],
+        [
+          21.1619,
+          -100.93
+        ],
+        [
+          21.8,
+          -100.85
+        ],
+        [
+          22.1565,
+          -100.9855
+        ],
+        [
+          23.6496,
+          -100.6441
+        ],
+        [
+          25.4232,
+          -100.9922
+        ],
+        [
+          25.6866,
+          -100.3161
+        ],
+        [
+          25.7785,
+          -100.1876
+        ]
+      ],
+      "alerta_id": "ALT-57D-BLOQUEO",
+      "alternativa": {
+        "id": "RUTA-57D-ALT",
+        "nombre": "Estrategia Dual de Desvío Autopista 45D (Bloqueo Km 182 + Desvío Anticipado CDMX)",
+        "distancia_km": 1040,
+        "tiempo_estimado_hrs": 12,
+        "color": "#34A853",
+        "dashArray": "4, 6",
+        "coordenadas_bloqueo": [
+          [
+            21.1619,
+            -100.93
+          ],
+          [
+            21.298,
+            -100.516
+          ],
+          [
+            21.478,
+            -101.216
+          ],
+          [
+            21.867,
+            -101.59
+          ],
+          [
+            21.8853,
+            -102.2916
+          ],
+          [
+            22.7709,
+            -102.5832
+          ],
+          [
+            23.9,
+            -102
+          ],
+          [
+            25.4232,
+            -100.9922
+          ],
+          [
+            25.6866,
+            -100.3161
+          ],
+          [
+            25.7785,
+            -100.1876
+          ]
+        ],
+        "coordenadas_anticipado": [
+          [
+            19.6711,
+            -99.1783
+          ],
+          [
+            19.95,
+            -99.53
+          ],
+          [
+            20.35,
+            -99.98
+          ],
+          [
+            20.5888,
+            -100.3899
+          ],
+          [
+            20.5287,
+            -100.8142
+          ],
+          [
+            20.7214,
+            -101.3468
+          ],
+          [
+            20.9167,
+            -101.4
+          ],
+          [
+            21.8853,
+            -102.2916
+          ],
+          [
+            22.7709,
+            -102.5832
+          ],
+          [
+            23.9,
+            -102
+          ],
+          [
+            25.4232,
+            -100.9922
+          ],
+          [
+            25.6866,
+            -100.3161
+          ],
+          [
+            25.7785,
+            -100.1876
+          ]
+        ],
+        "coordenadas": [
+          [
+            21.1619,
+            -100.93
+          ],
+          [
+            21.298,
+            -100.516
+          ],
+          [
+            21.478,
+            -101.216
+          ],
+          [
+            21.867,
+            -101.59
+          ],
+          [
+            21.8853,
+            -102.2916
+          ],
+          [
+            22.7709,
+            -102.5832
+          ],
+          [
+            23.9,
+            -102
+          ],
+          [
+            25.4232,
+            -100.9922
+          ],
+          [
+            25.6866,
+            -100.3161
+          ],
+          [
+            25.7785,
+            -100.1876
+          ]
+        ],
+        "consideraciones": {
+          "delta_tiempo": "+1.5 hrs de tránsito vs +8.0 hrs detenido en bloqueo",
+          "delta_combustible_usd": 85,
+          "delta_peajes_usd": 35,
+          "ahorro_penalizacion_usd": 42000,
+          "ahorro_neto_usd": 41880,
+          "seguridad_vial": "Alta (Autopistas federales de cuota con patrullaje Guardia Nacional)",
+          "recomendacion": "Desviar las unidades detenidas en Km 182 por el enlace San Felipe y despachar nuevas unidades directamente por Querétaro-Celaya 45D."
+        }
+      }
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "TRK-101",
+      "nombre": "Transporte T-101 (Kenworth T680)",
+      "conductor": "Roberto Gómez",
+      "ruta_id": "RUTA-CDMX-HER",
+      "origen": "CEDIS Central Cuautitlán (CDMX)",
+      "destino": "CEDIS Noroeste Hermosillo (Sonora)",
+      "fecha_hora_salida": "27 Sep 2026, 05:00 hrs",
+      "eta_llegada": "28 Sep 2026, 03:30 hrs",
+      "posicion_actual": {
+        "lat": 20.5888,
+        "lon": -100.3899
+      },
+      "progreso_pct": 18,
+      "velocidad_kmh": 85,
+      "carga": "Microchips y Sensores Industriales",
+      "peso_ton": 26,
+      "especificaciones": "Carga seca de alto valor, monitoreo GPS 24/7",
+      "cliente": "Foxconn Bajío",
+      "penalizacion_usd": 0,
+      "estado_transito": "En tránsito normal hacia Guadalajara",
+      "estado_operativo": "Normal",
+      "icono": "mdi-truck-fast",
+      "segment_index": 3
+    },
+    {
+      "id": "TRK-102",
+      "nombre": "Transporte T-102 (Volvo FH16 Doble Semirremolque)",
+      "conductor": "Carlos Mendoza",
+      "ruta_id": "RUTA-CDMX-HER",
+      "origen": "CEDIS Central Cuautitlán (CDMX)",
+      "destino": "CEDIS Noroeste Hermosillo (Sonora)",
+      "fecha_hora_salida": "26 Sep 2026, 20:00 hrs",
+      "eta_llegada": "27 Sep 2026, 18:30 hrs",
+      "posicion_actual": {
+        "lat": 21.5039,
+        "lon": -104.8946
+      },
+      "progreso_pct": 42,
+      "velocidad_kmh": 82,
+      "carga": "Módulos Eléctricos EV y Baterías de Litio",
+      "peso_ton": 30,
+      "especificaciones": "Material HazMat Grado 9, control térmico",
+      "cliente": "Tesla Gigafactory Supplier",
+      "penalizacion_usd": 0,
+      "estado_transito": "En tránsito regular tramo Tepic - Mazatlán",
+      "estado_operativo": "Normal",
+      "icono": "mdi-truck-fast",
+      "segment_index": 8
+    },
+    {
+      "id": "TRK-103",
+      "nombre": "Transporte T-103 (Freightliner Cascadia Termo)",
+      "conductor": "Javier Ruiz",
+      "ruta_id": "RUTA-CDMX-HER",
+      "origen": "CEDIS Central Cuautitlán (CDMX)",
+      "destino": "CEDIS Noroeste Hermosillo (Sonora)",
+      "fecha_hora_salida": "26 Sep 2026, 14:00 hrs",
+      "eta_llegada": "27 Sep 2026, 12:30 hrs",
+      "posicion_actual": {
+        "lat": 24.8091,
+        "lon": -107.394
+      },
+      "progreso_pct": 68,
+      "velocidad_kmh": 88,
+      "carga": "Dispositivos Médicos Refrigerados (4°C)",
+      "peso_ton": 22,
+      "especificaciones": "Cadena de frío activa, telemetría IoT",
+      "cliente": "MedTech México",
+      "penalizacion_usd": 0,
+      "estado_transito": "En tránsito normal por Culiacán hacia Los Mochis",
+      "estado_operativo": "Normal",
+      "icono": "mdi-truck-fast",
+      "segment_index": 18
+    },
+    {
+      "id": "TRK-104",
+      "nombre": "Transporte T-104 (Scania R450)",
+      "conductor": "Miguel Ángel Torres",
+      "ruta_id": "RUTA-CDMX-HER",
+      "origen": "CEDIS Central Cuautitlán (CDMX)",
+      "destino": "CEDIS Noroeste Hermosillo (Sonora)",
+      "fecha_hora_salida": "26 Sep 2026, 08:00 hrs",
+      "eta_llegada": "27 Sep 2026, 06:30 hrs",
+      "posicion_actual": {
+        "lat": 28.025,
+        "lon": -110.867
+      },
+      "progreso_pct": 88,
+      "velocidad_kmh": 90,
+      "carga": "Componentes Aeroespaciales de Titanio",
+      "peso_ton": 28,
+      "especificaciones": "Carga sobredimensionada, escolta satelital",
+      "cliente": "Safran Aerospace Sonora",
+      "penalizacion_usd": 0,
+      "estado_transito": "Aproximándose a Hermosillo (tramo Guaymas)",
+      "estado_operativo": "Normal",
+      "icono": "mdi-truck-fast",
+      "segment_index": 28
+    },
+    {
+      "id": "TRK-201",
+      "nombre": "Transporte T-201 (International LT)",
+      "conductor": "Andrés Pech",
+      "ruta_id": "RUTA-MID-CDMX",
+      "origen": "CEDIS Peninsular Mérida (Yucatán)",
+      "destino": "CEDIS Central Cuautitlán (CDMX)",
+      "fecha_hora_salida": "27 Sep 2026, 06:00 hrs",
+      "eta_llegada": "27 Sep 2026, 22:00 hrs",
+      "posicion_actual": {
+        "lat": 19.8301,
+        "lon": -90.5349
+      },
+      "progreso_pct": 15,
+      "velocidad_kmh": 80,
+      "carga": "Miel Orgánica de Exportación & Derivados",
+      "peso_ton": 24,
+      "especificaciones": "Grado alimenticio en tambores de acero inox",
+      "cliente": "Mieles Peninsulares",
+      "penalizacion_usd": 0,
+      "estado_transito": "En tránsito por Campeche rumbo a Carmen",
+      "estado_operativo": "Normal",
+      "icono": "mdi-truck-fast",
+      "segment_index": 4
+    },
+    {
+      "id": "TRK-202",
+      "nombre": "Transporte T-202 (Kenworth T880 Termo)",
+      "conductor": "Fernando Canul",
+      "ruta_id": "RUTA-MID-CDMX",
+      "origen": "CEDIS Peninsular Mérida (Yucatán)",
+      "destino": "CEDIS Central Cuautitlán (CDMX)",
+      "fecha_hora_salida": "26 Sep 2026, 23:00 hrs",
+      "eta_llegada": "27 Sep 2026, 15:00 hrs",
+      "posicion_actual": {
+        "lat": 17.9892,
+        "lon": -92.9281
+      },
+      "progreso_pct": 38,
+      "velocidad_kmh": 84,
+      "carga": "Productos Cárnicos y Avícolas Congelados (-18°C)",
+      "peso_ton": 32,
+      "especificaciones": "Cadena de frío ultra congelada certificada",
+      "cliente": "Kekén Alimentos",
+      "penalizacion_usd": 0,
+      "estado_transito": "En tránsito regular pasando Villahermosa",
+      "estado_operativo": "Normal",
+      "icono": "mdi-truck-fast",
+      "segment_index": 18
+    },
+    {
+      "id": "TRK-203",
+      "nombre": "Transporte T-203 (Volvo FH16 Doble Tolva)",
+      "conductor": "Jorge Balam",
+      "ruta_id": "RUTA-MID-CDMX",
+      "origen": "CEDIS Peninsular Mérida (Yucatán)",
+      "destino": "CEDIS Central Cuautitlán (CDMX)",
+      "fecha_hora_salida": "26 Sep 2026, 18:00 hrs",
+      "eta_llegada": "27 Sep 2026, 10:00 hrs",
+      "posicion_actual": {
+        "lat": 18.0062,
+        "lon": -95.2741
+      },
+      "progreso_pct": 62,
+      "velocidad_kmh": 82,
+      "carga": "Polietileno de Alta Densidad y Resinas",
+      "peso_ton": 28,
+      "especificaciones": "Granel industrial certificado ISO 9001",
+      "cliente": "Braskem Idesa",
+      "penalizacion_usd": 0,
+      "estado_transito": "En tránsito autopista Acayucan - Cosamaloapan",
+      "estado_operativo": "Normal",
+      "icono": "mdi-truck-fast",
+      "segment_index": 22
+    },
+    {
+      "id": "TRK-204",
+      "nombre": "Transporte T-204 (Freightliner Cascadia)",
+      "conductor": "Raúl Medina",
+      "ruta_id": "RUTA-MID-CDMX",
+      "origen": "CEDIS Peninsular Mérida (Yucatán)",
+      "destino": "CEDIS Central Cuautitlán (CDMX)",
+      "fecha_hora_salida": "26 Sep 2026, 12:00 hrs",
+      "eta_llegada": "27 Sep 2026, 04:00 hrs",
+      "posicion_actual": {
+        "lat": 19.0414,
+        "lon": -98.2063
+      },
+      "progreso_pct": 85,
+      "velocidad_kmh": 86,
+      "carga": "Insumos de Empaque & Retail Nacional",
+      "peso_ton": 20,
+      "especificaciones": "Carga seca paletizada de alta rotación",
+      "cliente": "Grupo Modelo Centro",
+      "penalizacion_usd": 0,
+      "estado_transito": "Ascendiendo por Puebla rumbo a Río Frío y CDMX",
+      "estado_operativo": "Normal",
+      "icono": "mdi-truck-fast",
+      "segment_index": 27
+    },
+    {
+      "id": "TRK-301",
+      "nombre": "Transporte T-301 (Kenworth T680)",
+      "conductor": "Armando Morales",
+      "ruta_id": "RUTA-CDMX-MTY",
+      "origen": "CEDIS Central Cuautitlán (CDMX)",
+      "destino": "CEDIS Macro Norte Apodaca (MTY)",
+      "fecha_hora_salida": "27 Sep 2026, 08:30 hrs",
+      "eta_llegada": "27 Sep 2026, 19:00 hrs",
+      "posicion_actual": {
+        "lat": 20.5888,
+        "lon": -100.3899
+      },
+      "progreso_pct": 28,
+      "velocidad_kmh": 84,
+      "carga": "Autopartes de Estampado de Precisión",
+      "peso_ton": 28,
+      "especificaciones": "Contenedores de retorno racks automotrices",
+      "cliente": "Nemak Monterrey",
+      "penalizacion_usd": 0,
+      "estado_transito": "Cruzando Querétaro en tránsito regular hacia el Bajío",
+      "estado_operativo": "Normal",
+      "icono": "mdi-truck-fast",
+      "segment_index": 3
+    },
+    {
+      "id": "TRK-302",
+      "nombre": "Transporte T-302 (Volvo FH16)",
+      "conductor": "Enrique Salgado",
+      "ruta_id": "RUTA-CDMX-MTY",
+      "origen": "CEDIS Central Cuautitlán (CDMX)",
+      "destino": "CEDIS Macro Norte Apodaca (MTY)",
+      "fecha_hora_salida": "27 Sep 2026, 06:00 hrs",
+      "eta_llegada": "27 Sep 2026, 16:30 hrs",
+      "posicion_actual": {
+        "lat": 21.1619,
+        "lon": -100.93
+      },
+      "progreso_pct": 48,
+      "velocidad_kmh": 0,
+      "carga": "Bobinas de Acero Automotriz (34 Tons)",
+      "peso_ton": 34,
+      "especificaciones": "Acero rolado en caliente para chasises",
+      "cliente": "Industrias Metálicas del Norte",
+      "penalizacion_usd": 24000,
+      "estado_transito": "Detenido al frente del bloqueo carretero en Km 182",
+      "estado_operativo": "Afectado",
+      "icono": "mdi-truck-alert",
+      "segment_index": 4
+    },
+    {
+      "id": "TRK-303",
+      "nombre": "Transporte T-303 (Freightliner Cascadia)",
+      "conductor": "Daniel Treviño",
+      "ruta_id": "RUTA-CDMX-MTY",
+      "origen": "CEDIS Central Cuautitlán (CDMX)",
+      "destino": "CEDIS Macro Norte Apodaca (MTY)",
+      "fecha_hora_salida": "27 Sep 2026, 06:15 hrs",
+      "eta_llegada": "27 Sep 2026, 16:45 hrs",
+      "posicion_actual": {
+        "lat": 21.135,
+        "lon": -100.915
+      },
+      "progreso_pct": 46,
+      "velocidad_kmh": 0,
+      "carga": "Placas de Acero Rolado y Perfiles",
+      "peso_ton": 30,
+      "especificaciones": "Estructuras pesadas con amarre tensor certificado",
+      "cliente": "Fábricas de Acero Monterrey",
+      "penalizacion_usd": 18000,
+      "estado_transito": "Detenido en fila de espera (Posición 2 detrás de TRK-302)",
+      "estado_operativo": "Afectado",
+      "icono": "mdi-truck-alert",
+      "segment_index": 4
+    },
+    {
+      "id": "TRK-304",
+      "nombre": "Transporte T-304 (International ProStar)",
+      "conductor": "Salvador Garza",
+      "ruta_id": "RUTA-CDMX-MTY",
+      "origen": "CEDIS Central Cuautitlán (CDMX)",
+      "destino": "CEDIS Macro Norte Apodaca (MTY)",
+      "fecha_hora_salida": "27 Sep 2026, 06:30 hrs",
+      "eta_llegada": "27 Sep 2026, 17:00 hrs",
+      "posicion_actual": {
+        "lat": 21.108,
+        "lon": -100.9
+      },
+      "progreso_pct": 44,
+      "velocidad_kmh": 0,
+      "carga": "Perfiles Estructurales y Vigueta",
+      "peso_ton": 32,
+      "especificaciones": "Acero pesado con custodia satelital activa",
+      "cliente": "Ternium México Planta Churubusco",
+      "penalizacion_usd": 12000,
+      "estado_transito": "Detenido en fila de espera (Posición 3 con intermitentes)",
+      "estado_operativo": "Afectado",
+      "icono": "mdi-truck-alert",
+      "segment_index": 4
+    },
+    {
+      "id": "TRK-305",
+      "nombre": "Transporte T-305 (Scania R450)",
+      "conductor": "Guillermo Luna",
+      "ruta_id": "RUTA-CDMX-MTY",
+      "origen": "CEDIS Central Cuautitlán (CDMX)",
+      "destino": "CEDIS Macro Norte Apodaca (MTY)",
+      "fecha_hora_salida": "27 Sep 2026, 08:45 hrs",
+      "eta_llegada": "27 Sep 2026, 19:15 hrs",
+      "posicion_actual": {
+        "lat": 20.35,
+        "lon": -99.98
+      },
+      "progreso_pct": 20,
+      "velocidad_kmh": 82,
+      "carga": "Motores de Lavadoras y Ensambles Línea Blanca",
+      "peso_ton": 26,
+      "especificaciones": "Carga frágil para línea de ensamblaje JIT",
+      "cliente": "Whirlpool México",
+      "penalizacion_usd": 0,
+      "estado_transito": "Cruzando San Juan del Río en dirección a Querétaro",
+      "estado_operativo": "Normal",
+      "icono": "mdi-truck-fast",
+      "segment_index": 2
+    },
+    {
+      "id": "TRK-306",
+      "nombre": "Transporte T-306 (Kenworth T680)",
+      "conductor": "Alejandro Peñaloza",
+      "ruta_id": "RUTA-CDMX-MTY",
+      "origen": "CEDIS Central Cuautitlán (CDMX)",
+      "destino": "CEDIS Macro Norte Apodaca (MTY)",
+      "fecha_hora_salida": "27 Sep 2026, 09:15 hrs",
+      "eta_llegada": "27 Sep 2026, 19:45 hrs",
+      "posicion_actual": {
+        "lat": 19.95,
+        "lon": -99.53
+      },
+      "progreso_pct": 12,
+      "velocidad_kmh": 80,
+      "carga": "Resinas Plásticas Industriales y Polímeros",
+      "peso_ton": 25,
+      "especificaciones": "Material seco paletizado libre de humedad",
+      "cliente": "Alpek Poliéster",
+      "penalizacion_usd": 0,
+      "estado_transito": "Saliendo de Tepeji del Río hacia San Juan del Río",
+      "estado_operativo": "Normal",
+      "icono": "mdi-truck-fast",
+      "segment_index": 1
+    },
+    {
+      "id": "TRK-307",
+      "nombre": "Transporte T-307 (Freightliner Cascadia 2026)",
+      "conductor": "Raúl Cárdenas",
+      "ruta_id": "RUTA-CDMX-MTY",
+      "origen": "CEDIS Central Cuautitlán (CDMX)",
+      "destino": "CEDIS Macro Norte Apodaca (MTY)",
+      "fecha_hora_salida": "27 Sep 2026, 09:40 hrs",
+      "eta_llegada": "27 Sep 2026, 20:10 hrs",
+      "posicion_actual": {
+        "lat": 19.6711,
+        "lon": -99.1783
+      },
+      "progreso_pct": 3,
+      "velocidad_kmh": 68,
+      "carga": "Semiconductores y Módulos ECU de Precisión",
+      "peso_ton": 19,
+      "especificaciones": "Control térmico 18-22°C y suspensión de aire",
+      "cliente": "Continental Automotive México",
+      "penalizacion_usd": 0,
+      "estado_transito": "Despacho reciente desde andén de salida CEDIS CDMX",
+      "estado_operativo": "Normal",
+      "icono": "mdi-truck-fast",
+      "segment_index": 0
+    },
+    {
+      "id": "TRK-308",
+      "nombre": "Transporte T-308 (Volvo FH16 Doble Remolque)",
+      "conductor": "Héctor Villalobos",
+      "ruta_id": "RUTA-CDMX-MTY",
+      "origen": "CEDIS Central Cuautitlán (CDMX)",
+      "destino": "CEDIS Macro Norte Apodaca (MTY)",
+      "fecha_hora_salida": "27 Sep 2026, 03:00 hrs",
+      "eta_llegada": "27 Sep 2026, 13:30 hrs",
+      "posicion_actual": {
+        "lat": 23.6496,
+        "lon": -100.6441
+      },
+      "progreso_pct": 74,
+      "velocidad_kmh": 88,
+      "carga": "Componentes HVAC y Compresores de Refrigeración",
+      "peso_ton": 29,
+      "especificaciones": "Embarque JIT para armadora pesada",
+      "cliente": "Carrier México Planta Santa Catarina",
+      "penalizacion_usd": 0,
+      "estado_transito": "Tramo Matehuala - Saltillo en tránsito fluido",
+      "estado_operativo": "Normal",
+      "icono": "mdi-truck-fast",
+      "segment_index": 7
+    },
+    {
+      "id": "TRK-309",
+      "nombre": "Transporte T-309 (Kenworth T680)",
+      "conductor": "Marcos Del Valle",
+      "ruta_id": "RUTA-CDMX-MTY",
+      "origen": "CEDIS Central Cuautitlán (CDMX)",
+      "destino": "CEDIS Macro Norte Apodaca (MTY)",
+      "fecha_hora_salida": "27 Sep 2026, 01:00 hrs",
+      "eta_llegada": "27 Sep 2026, 11:30 hrs",
+      "posicion_actual": {
+        "lat": 25.4232,
+        "lon": -100.9922
+      },
+      "progreso_pct": 90,
+      "velocidad_kmh": 82,
+      "carga": "Arneses Automotrices de Alto Calibre",
+      "peso_ton": 22,
+      "especificaciones": "Racks certificados con trazabilidad RFID",
+      "cliente": "Kia Motors México Pesquería",
+      "penalizacion_usd": 0,
+      "estado_transito": "Tramo Saltillo - Monterrey aproximándose a Apodaca",
+      "estado_operativo": "Normal",
+      "icono": "mdi-truck-fast",
+      "segment_index": 8
+    }
+  ],
+  "alerts": [
+    {
+      "id": "ALT-57D-BLOQUEO",
+      "ruta_id": "RUTA-CDMX-MTY",
+      "ruta_nombre": "Corredor Central 57D (CDMX ➔ MTY)",
+      "segmento": "Km 182 Tramo Querétaro - San Luis Potosí",
+      "lat": 21.1619,
+      "lon": -100.93,
+      "tipo_incidencia": "Bloqueo Carretero y Obras Mayores",
+      "severidad": "Crítica",
+      "retraso_estimado_hrs": 8,
+      "impacto_financiero_usd": 54000,
+      "vehiculos_afectados_ids": [
+        "TRK-302",
+        "TRK-303",
+        "TRK-304"
+      ],
+      "clientes_afectados": [
+        "Industrias Metálicas del Norte",
+        "Fábricas de Acero Monterrey",
+        "Ternium México Planta Churubusco"
+      ],
+      "descripcion": "Cierre total en ambos sentidos en el Km 182 por manifestación de transportistas y obras mayores en la carpeta asfáltica.",
+      "icono": "mdi-alert-octagon"
+    }
+  ]
+}

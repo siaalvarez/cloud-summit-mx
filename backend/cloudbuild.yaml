@@ -1,0 +1,65 @@
+steps:
+  # 1. Construir imagen de contenedor
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE_NAME}:${BUILD_ID}'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE_NAME}:latest'
+      - '.'
+
+  # 2. Subir imagen a Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '--all-tags'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE_NAME}'
+
+  # 3. Desplegar en Cloud Run con alta capacidad para Demo (2 vCPU, 4Gi, 1-3 instancias)
+  # Solo peticiones autenticadas (--no-allow-unauthenticated) y accesible por internet
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - '${_SERVICE_NAME}'
+      - '--image'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE_NAME}:${BUILD_ID}'
+      - '--region'
+      - '${_REGION}'
+      - '--platform'
+      - 'managed'
+      - '--cpu'
+      - '${_CPU}'
+      - '--memory'
+      - '${_MEMORY}'
+      - '--min-instances'
+      - '${_MIN_INSTANCES}'
+      - '--max-instances'
+      - '${_MAX_INSTANCES}'
+      - '--no-allow-unauthenticated'
+      - '--ingress'
+      - 'all'
+      - '--service-account'
+      - '${_SERVICE_ACCOUNT}'
+      - '--set-env-vars'
+      - 'PROJECT_ID=${PROJECT_ID},LOCATION=${_VERTEX_LOCATION}'
+
+substitutions:
+  _REGION: 'northamerica-south1'
+  _REPO_NAME: 'summit-repo'
+  _SERVICE_NAME: 'summit-backend'
+  _CPU: '2'
+  _MEMORY: '4Gi'
+  _MIN_INSTANCES: '1'
+  _MAX_INSTANCES: '3'
+  _SERVICE_ACCOUNT: 'summit-backend-sa@cloud-summit-mx.iam.gserviceaccount.com'
+  _VERTEX_LOCATION: 'global'
+
+images:
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE_NAME}:${BUILD_ID}'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE_NAME}:latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY

@@ -194,7 +194,9 @@ REGLAS DE FORMATO (ESTRICTAS):
 """
 
 # Cargar Dataset Maestro Local de Logística
-LOGISTICA_DATA_FILE = os.path.join(os.path.dirname(__file__), "..", "frontend", "data", "logistica_data.json")
+local_data = os.path.join(os.path.dirname(__file__), "data", "logistica_data.json")
+frontend_data = os.path.join(os.path.dirname(__file__), "..", "frontend", "data", "logistica_data.json")
+LOGISTICA_DATA_FILE = local_data if os.path.exists(local_data) else frontend_data
 try:
     with open(LOGISTICA_DATA_FILE, "r", encoding="utf-8") as f:
         LOGISTICA_MASTER_DATA = json.load(f)
