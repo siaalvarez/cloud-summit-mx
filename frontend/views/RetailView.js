@@ -317,14 +317,11 @@ const RetailView = {
                   <!-- Columna Izquierda: Gráfica Dual de Desfase y Proyección -->
                   <v-col cols="12" md="7">
                     <v-card class="pa-3 pa-md-4 rounded-xl h-100 bg-white d-flex flex-column" elevation="1" style="border: 1px solid #e8eaed;">
-                      <div class="d-flex align-center justify-space-between mb-1">
-                        <div>
-                          <div class="font-weight-bold text-caption text-uppercase" style="color: #202124; font-size: 11.5px;">
-                            Efecto Tijera: Ventas Semanales vs Demanda Externa
-                          </div>
-                          <span class="text-caption text-grey-darken-1" style="font-size: 10.5px;">Unidades vendidas vs Índice de búsqueda y recuperación estimada</span>
+                      <div class="mb-1">
+                        <div class="font-weight-bold text-caption text-uppercase" style="color: #202124; font-size: 11.5px;">
+                          Efecto Tijera: Ventas Semanales vs Demanda Externa
                         </div>
-                        <v-chip size="x-small" color="#EA4335" variant="tonal" class="font-weight-bold">CDMX & MTY</v-chip>
+                        <span class="text-caption text-grey-darken-1" style="font-size: 10.5px;">Unidades vendidas vs Índice de búsqueda y recuperación estimada</span>
                       </div>
                       
                       <!-- Leyenda Visual Rápida -->
