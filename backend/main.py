@@ -39,8 +39,8 @@ LOCATION = os.getenv("LOCATION", "global")
 MODEL_CANDIDATES = [
     os.getenv("GEMINI_MODEL", "gemini-3.8-flash"),
     "gemini-3.8-flash",
-    "gemini-2.5-flash",
-    "gemini-2.0-flash"
+    "gemini-3.7-flash",
+    "gemini-2.5-flash"
 ]
 MODEL_CANDIDATES = list(dict.fromkeys(MODEL_CANDIDATES))
 
@@ -366,6 +366,7 @@ def chat_general(request: ChatRequest):
                         tools=[search_tool],
                         system_instruction=GENERAL_SYSTEM_INSTRUCTION,
                         temperature=0.7,
+                        thinking_config=types.ThinkingConfig(thinking_budget=0),
                         http_options=PRIORITY_HTTP_OPTIONS
                     )
                     chat_sessions_general[session_id] = client.chats.create(
@@ -414,6 +415,7 @@ def chat_retail(request: ChatRequest):
                     config = types.GenerateContentConfig(
                         system_instruction=RETAIL_SYSTEM_INSTRUCTION,
                         temperature=0.7,
+                        thinking_config=types.ThinkingConfig(thinking_budget=0),
                         http_options=PRIORITY_HTTP_OPTIONS
                     )
                     chat_sessions_retail[session_id] = client.chats.create(
@@ -460,6 +462,7 @@ def chat_logistica(request: ChatRequest):
                     config = types.GenerateContentConfig(
                         system_instruction=LOGISTICA_SYSTEM_INSTRUCTION,
                         temperature=0.7,
+                        thinking_config=types.ThinkingConfig(thinking_budget=0),
                         http_options=PRIORITY_HTTP_OPTIONS
                     )
                     chat_sessions_logistica[session_id] = client.chats.create(
@@ -508,6 +511,7 @@ def chat_fintech(request: ChatRequest):
                     config = types.GenerateContentConfig(
                         system_instruction=FINTECH_SYSTEM_INSTRUCTION,
                         temperature=0.7,
+                        thinking_config=types.ThinkingConfig(thinking_budget=0),
                         http_options=PRIORITY_HTTP_OPTIONS
                     )
                     chat_sessions_fintech[session_id] = client.chats.create(
