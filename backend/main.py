@@ -44,6 +44,16 @@ MODEL_CANDIDATES = [
 ]
 MODEL_CANDIDATES = list(dict.fromkeys(MODEL_CANDIDATES))
 
+# Configuración de Priority Pay-As-You-Go (Priority PayGo) para Vertex AI
+# Requiere endpoint global y los encabezados X-Vertex-AI-LLM-Request-Type / X-Vertex-AI-LLM-Shared-Request-Type
+PRIORITY_HTTP_OPTIONS = types.HttpOptions(
+    api_version="v1",
+    headers={
+        "X-Vertex-AI-LLM-Request-Type": "shared",
+        "X-Vertex-AI-LLM-Shared-Request-Type": "priority"
+    }
+)
+
 _cached_client = None
 
 def get_genai_client():
@@ -54,7 +64,7 @@ def get_genai_client():
     api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
     if api_key:
         try:
-            _cached_client = genai.Client(api_key=api_key)
+            _cached_client = genai.Client(api_key=api_key, http_options=PRIORITY_HTTP_OPTIONS)
             return _cached_client
         except Exception as e:
             print(f"[Backend] Error con API key: {e}")
@@ -77,9 +87,14 @@ def get_genai_client():
 
     for proj in projects_to_try:
         try:
-            client = genai.Client(vertexai=True, project=proj, location=LOCATION)
+            client = genai.Client(
+                vertexai=True,
+                project=proj,
+                location=LOCATION,
+                http_options=PRIORITY_HTTP_OPTIONS
+            )
             _cached_client = client
-            print(f"[Backend] Vertex AI iniciado exitosamente en {proj} con endpoint {LOCATION}")
+            print(f"[Backend] Vertex AI iniciado exitosamente en {proj} con endpoint {LOCATION} y Priority PayGo")
             return _cached_client
         except Exception as e:
             print(f"[Backend] Error iniciando Vertex AI con {proj}: {e}")
@@ -111,7 +126,7 @@ SAMPLE_VENTAS_RETAIL = [
     {"id_producto": "CAT-007", "producto": "Juguetería, Bebés & Niños", "categoria": "Juguetería", "ventas_actuales": 12800000, "ventas_pasadas": 11786000, "variacion_pct": 8.6, "transacciones": 13910, "ticket_promedio": 920, "stock": 5800000},
     {"id_producto": "CAT-008", "producto": "Alimentos Gourmet & Vinos", "categoria": "Gourmet", "ventas_actuales": 11400000, "ventas_pasadas": 10744000, "variacion_pct": 6.1, "transacciones": 7860, "ticket_promedio": 1450, "stock": 4200000},
     {"id_producto": "CAT-009", "producto": "Farmacia & Nutrición Wellness", "categoria": "Farmacia", "ventas_actuales": 9700000, "ventas_pasadas": 8834000, "variacion_pct": 9.8, "transacciones": 15390, "ticket_promedio": 630, "stock": 3100000},
-    {"id_producto": "CAT-010", "producto": "Automotriz & Herramientas", "categoria": "Automotriz", "ventas_actuales": 8300000, "ventas_pasadas": 8627000, "variacion_pct": -3.8, "transacciones": 3950, "ticket_promedio": 2100, "stock": 5600000},
+    {"id_producto": "CAT-010", "producto": "Automotriz & Herramientas", "categoria": "Automotriz", "ventas_actuales": 8300000, "ventas_pasadas": 8627000, "variacion_pct": -3.8, "transacciones": 3950, "ticket_promedio": 2100, "stock": 4700000},
     {"id_producto": "CAT-011", "producto": "Mascotas & Pet Care", "categoria": "Mascotas", "ventas_actuales": 7500000, "ventas_pasadas": 6437000, "variacion_pct": 16.5, "transacciones": 14705, "ticket_promedio": 510, "stock": 2900000},
     {"id_producto": "CAT-012", "producto": "Cómputo & Oficina", "categoria": "Cómputo", "ventas_actuales": 6800000, "ventas_pasadas": 6967000, "variacion_pct": -2.4, "transacciones": 1740, "ticket_promedio": 3900, "stock": 4500000},
 ]
@@ -136,7 +151,7 @@ INSTRUCCIONES CLAVE:
 - Cuando la consulta del usuario se relacione con alguno de los tres sectores, ofrece un resumen de alto nivel y sugiere interactuar directamente con el Agente Especializado correspondiente.
 """
 
-RETAIL_SYSTEM_INSTRUCTION = f"""Eres el Copiloto Estratégico de Retail y Marketing impulsado por Gemini para directivos en México.
+RETAIL_SYSTEM_INSTRUCTION = f"""Eres el Agente Estratégico de Retail y Marketing para directivos de e-commerce y retail en México.
 Tu objetivo es identificar caídas en ventas y cruzarlas con tendencias del mercado para proponer campañas hiper-personalizadas y optimizar inventarios.
 
 DATOS DE VENTAS E-COMMERCE:
@@ -145,11 +160,37 @@ DATOS DE VENTAS E-COMMERCE:
 TENDENCIAS DE MERCADO (GOOGLE TRENDS):
 {json.dumps(SAMPLE_TRENDS_RETAIL, indent=2, ensure_ascii=False)}
 
+STOCK EN RIESGO ($44.2M MXN CONSOLIDADOS EN 4 CATEGORÍAS):
+El portafolio tiene exactamente $44.2M MXN de inventario inmovilizado en 4 macro-categorías clave:
+1. 🛋️ **Hogar, Muebles & Decoración**: **$15.8M MXN** inmovilizados (-11.2% YoY). Causa: Caída post-remodelaciones y ticket de $3,100. Acción sugerida: Alianzas de financiamiento (12-18 Meses Sin Intereses con bancos), venta cruzada con paquetes de renovación de interiores y bundle con envíos gratuitos.
+2. 🏃 **Deportes & Outdoor**: **$12.5M MXN** inmovilizados (-18.4% YoY). Causa: Desfase crítico (demanda de "Maratón CDMX" subió +92% en Google Trends pero el catálogo no se visibilizó). Acción sugerida: Campaña hiper-personalizada omnicanal orientada a corredores (calzado técnico y kits de hidratación) con activación local en tiendas de CDMX.
+3. ❄️ **Línea Blanca & Climatización**: **$11.2M MXN** inmovilizados (-5.1% YoY). Causa: Caída estacional post ola de calor en equipos de enfriamiento y ticket alto ($6,400). Acción sugerida: Venta Flash de liquidación de temporada, bonificación en instalación certificada y preventa de calefacción/clima de invierno.
+4. 🔧 **Automotriz & Herramientas**: **$4.7M MXN** inmovilizados (-3.8% YoY). Causa: Desaceleración en mantenimiento preventivo. Acción sugerida: Campaña "Revisión Preventiva de Otoño" en baterías y llantas, paquetes de afinación con instalación aliada y promociones B2B para talleres mecánicos.
+
+DETALLE OPERATIVO DEEP DIVE DEPORTES (INVENTARIO EN RIESGO: $12.5M MXN):
+- Sub-familias inmovilizadas:
+  1. Calzado Asfalto Placa de Carbono: $6.8M MXN (54% del riesgo, 2,400 pares, rotación 82 días).
+  2. Wearables & Monitoreo GPS: $3.2M MXN (26% del riesgo, 1,150 piezas, rotación 65 días).
+  3. Chalecos & Hidratación 5L: $1.8M MXN (14% del riesgo, 3,200 piezas, rotación 95 días).
+  4. Nutrición & Geles Deportivos: $0.7M MXN (6% del riesgo, 12,500 piezas, rotación 48 días).
+- SKUs Críticos Prioritarios:
+  * Tenis Carbon Pro CDMX Edition: $2,899 MXN | Margen 54% | Stock 2,400 pares. Táctica: Bundle con calcetas técnicas de compresión + 15% de descuento en par complementario (protege el margen del 54%).
+  * Smartwatch Marathon GPS & Pulsómetro: $4,499 MXN | Margen 42% | Stock 1,150 pzas. Táctica: Oferta a 6-12 Meses Sin Intereses con BBVA/Banorte y bundle con banda cardíaca.
+  * Chaleco Hidratación 5L Ergonómico: $1,299 MXN | Margen 61% | Stock 3,200 pzas. Táctica: Usar como Gift with Purchase (GWP) en compras de calzado >$2,500 o bundle calzado+chaleco a $3,499 MXN.
+- Plan de Campaña Omnicanal para el Maratón CDMX (21 días de ejecución):
+  * Presupuesto Propuesto: $120,000 MXN.
+  * Mix de Canales: 50% Google Ads PMax (intención transaccional), 35% Meta Ads / Instagram Reels con geocercas en Reforma/Chapultepec/Polanco, 15% Push App a corredores.
+  * Logística Express: Click & Collect en 4 horas en sucursales Roma, Polanco, Insurgentes y Santa Fe.
+  * Impacto Financiero Esperado: Recuperación proyectada de ~$4.5M a $4.8M MXN en inventario (Sell-through de ~38%, ROI de 37.5x sobre inversión en pauta).
+
 REGLAS DE FORMATO (ESTRICTAS):
 - Responde siempre en Markdown estructurado, limpio y visualmente atractivo.
-- Usa emojis estratégicamente (📉 caídas, 📈 alzas, 🎯 audiencias, 🚀 campañas).
+- Al responder sobre el Stock en Riesgo de $44.2M o las 4 categorías en riesgo, presenta una tabla ejecutiva comparativa con las 4 categorías, capital inmovilizado, variación YoY y acción estratégica concreta, seguida de los pasos de ejecución inmediata para desbloquear ese capital.
+- Al responder sobre el Deep Dive de Deportes o el Maratón CDMX, ofrece desgloses con cifras precisas de margen, presupuesto ($120k), SKUs y retorno esperado ($4.8M).
+- Usa emojis estratégicamente (📉 caídas, 📈 alzas, 🎯 audiencias, 🚀 campañas, ⚠️ alertas, 👟 calzado, ⏱️ tiempo).
 - Destaca cifras en **negritas** y con formato monetario ($ MXN).
 - Sé muy ejecutivo, analítico y directo al grano.
+- REGLA ESTRICTA DE IDENTIDAD: Preséntate y responde siempre de forma natural y profesional como el Agente de Retail y Marketing. NUNCA menciones nombres de modelos de lenguaje (como Gemini, Flash, etc.) ni uses frases en tercera persona como 'Gemini sugiere' o 'el Agente sugiere'. Habla siempre en primera persona dirigiéndote al directivo ('te sugiero', 'recomiendo', 'mi propuesta de acción es').
 """
 
 # Cargar Dataset Maestro Local de Logística
@@ -324,7 +365,8 @@ def chat_general(request: ChatRequest):
                     config = types.GenerateContentConfig(
                         tools=[search_tool],
                         system_instruction=GENERAL_SYSTEM_INSTRUCTION,
-                        temperature=0.7
+                        temperature=0.7,
+                        http_options=PRIORITY_HTTP_OPTIONS
                     )
                     chat_sessions_general[session_id] = client.chats.create(
                         model=model_name,
@@ -371,7 +413,8 @@ def chat_retail(request: ChatRequest):
                 if session_id not in chat_sessions_retail:
                     config = types.GenerateContentConfig(
                         system_instruction=RETAIL_SYSTEM_INSTRUCTION,
-                        temperature=0.7
+                        temperature=0.7,
+                        http_options=PRIORITY_HTTP_OPTIONS
                     )
                     chat_sessions_retail[session_id] = client.chats.create(
                         model=model_name,
@@ -387,7 +430,7 @@ def chat_retail(request: ChatRequest):
                     del chat_sessions_retail[session_id]
                 continue
 
-    raise HTTPException(status_code=500, detail="No se pudo conectar con Gemini para el Agente Retail.")
+    raise HTTPException(status_code=500, detail="No se pudo conectar con el Agente de Retail.")
 
 @app.get("/api/retail/chart")
 def get_retail_chart_data():
@@ -416,7 +459,8 @@ def chat_logistica(request: ChatRequest):
                 if session_id not in chat_sessions_logistica:
                     config = types.GenerateContentConfig(
                         system_instruction=LOGISTICA_SYSTEM_INSTRUCTION,
-                        temperature=0.7
+                        temperature=0.7,
+                        http_options=PRIORITY_HTTP_OPTIONS
                     )
                     chat_sessions_logistica[session_id] = client.chats.create(
                         model=model_name,
@@ -463,7 +507,8 @@ def chat_fintech(request: ChatRequest):
                 if session_id not in chat_sessions_fintech:
                     config = types.GenerateContentConfig(
                         system_instruction=FINTECH_SYSTEM_INSTRUCTION,
-                        temperature=0.7
+                        temperature=0.7,
+                        http_options=PRIORITY_HTTP_OPTIONS
                     )
                     chat_sessions_fintech[session_id] = client.chats.create(
                         model=model_name,
