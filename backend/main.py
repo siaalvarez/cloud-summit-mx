@@ -257,29 +257,396 @@ INSTRUCCIONES CLAVE DE RESPUESTA:
 ```
 """
 
-SAMPLE_FINTECH_DATA = [
-    {"nombre": "Empresa Aceros del Norte S.A.", "segmento": "Empresarial", "riesgo_abandono_pct": 82, "saldo_mxn": 1850000},
-    {"nombre": "Roberto Garza Sada", "segmento": "Patrimonial", "riesgo_abandono_pct": 74, "saldo_mxn": 1420000},
-    {"nombre": "Distribuidora Médica del Centro", "segmento": "Pyme", "riesgo_abandono_pct": 68, "saldo_mxn": 650000},
-    {"nombre": "Sofía Martínez Treviño", "segmento": "Premium", "riesgo_abandono_pct": 59, "saldo_mxn": 480000},
-    {"nombre": "Innovación Digital S.C.", "segmento": "Pyme", "riesgo_abandono_pct": 51, "saldo_mxn": 390000},
-    {"nombre": "Carlos Slim Domit", "segmento": "Patrimonial", "riesgo_abandono_pct": 24, "saldo_mxn": 3200000},
-    {"nombre": "Valeria Morales Ruiz", "segmento": "Joven", "riesgo_abandono_pct": 45, "saldo_mxn": 115000},
-    {"nombre": "Javier Hernández Balcázar", "segmento": "Premium", "riesgo_abandono_pct": 18, "saldo_mxn": 890000}
+FINTECH_PRODUCT_CATALOG = [
+    {
+        "id": "PROD-TPV-SMART",
+        "nombre": "Terminal Smart 4G Cero Renta",
+        "categoria": "Terminales de Pago",
+        "beneficio_clave": "0% costo de renta mensual al facturar más de $20,000 MXN/mes + conexión 4G ilimitada y depósito en 24h",
+        "margen_banco_spread": "1.60% comisión neta por transacción",
+        "elegibilidad": "Comercios, tiendas, restaurantes y profesionistas que cobren con tarjeta",
+        "poder_retencion_pct": 92,
+        "impacto_promedio": "Evita el abandono de terminales y frena la migración hacia agregadores externos y terminales móviles"
+    },
+    {
+        "id": "PROD-TPV-TASA",
+        "nombre": "Tasa Preferencial por Volumen TPV",
+        "categoria": "Terminales de Pago",
+        "beneficio_clave": "Reducción de comisión del 2.5% al 1.75% por facturación mensual mayor a $80,000 MXN",
+        "margen_banco_spread": "1.10% margen adquirente",
+        "elegibilidad": "Comercios de alta transaccionalidad (abarrotes, farmacias, restaurantes)",
+        "poder_retencion_pct": 89,
+        "impacto_promedio": "Blinda la facturación de comercios medianos frente a ofertas agresivas de competidores"
+    },
+    {
+        "id": "PROD-CRED-PYME",
+        "nombre": "Crédito PyME Capital de Trabajo",
+        "categoria": "Crédito a PyMEs",
+        "beneficio_clave": "Préstamo express de hasta $1.5M MXN pre-aprobado automáticamente con base en las ventas de la terminal",
+        "margen_banco_spread": "3.50% spread neto anual",
+        "elegibilidad": "PyMEs y negocios con al menos 6 meses facturando con nuestras terminales TPV",
+        "poder_retencion_pct": 86,
+        "impacto_promedio": "Fideliza al comercio conectando sus cobros diarios con financiamiento ágil para inventario"
+    },
+    {
+        "id": "PROD-PYME-LINEA",
+        "nombre": "Línea de Crédito Revolvente PyME",
+        "categoria": "Crédito a PyMEs",
+        "beneficio_clave": "Línea de crédito siempre disponible para emergencias o proveedores; solo pagas intereses por lo que usas",
+        "margen_banco_spread": "2.90% margen financiero",
+        "elegibilidad": "Negocios formales con facturación anual superior a $1.0M MXN",
+        "poder_retencion_pct": 81,
+        "impacto_promedio": "Previene que las PyMEs busquen créditos más caros y lentos en bancos tradicionales"
+    },
+    {
+        "id": "PROD-PREST-PERS",
+        "nombre": "Préstamo Personal Express a Tasa Fija",
+        "categoria": "Crédito a Personas",
+        "beneficio_clave": "Préstamo en 15 minutos de hasta $250,000 MXN con abonos fijos mensuales y depósito directo en cuenta",
+        "margen_banco_spread": "4.20% spread neto",
+        "elegibilidad": "Personas físicas con historial crediticio positivo y comprobante de ingresos",
+        "poder_retencion_pct": 84,
+        "impacto_promedio": "Otorga liquidez inmediata sin burocracia bancaria y frena la salida hacia otras financieras"
+    },
+    {
+        "id": "PROD-CARD-CASHBACK",
+        "nombre": "Tarjeta de Crédito con 2% Cashback",
+        "categoria": "Crédito a Personas",
+        "beneficio_clave": "Sin anualidad de por vida gastando $2,000/mes + 2% de cashback directo en todas las compras",
+        "margen_banco_spread": "1.80% tasa de intercambio (Interchange Fee)",
+        "elegibilidad": "Personas físicas con ingresos mensuales superiores a $15,000 MXN",
+        "poder_retencion_pct": 88,
+        "impacto_promedio": "Reactiva el uso diario de tarjetas inactivas en cajón y previene cancelaciones"
+    },
+    {
+        "id": "PROD-TPV-DIGITAL",
+        "nombre": "Cobro Digital & Link de Pago QR",
+        "categoria": "Terminales de Pago",
+        "beneficio_clave": "Herramienta para cobrar a distancia por WhatsApp, redes sociales y código QR sin mensualidad, unificada con la cuenta de la terminal",
+        "margen_banco_spread": "1.95% comisión fija por cobro digital",
+        "elegibilidad": "Comercios, boutiques, restaurantes y negocios con venta a domicilio o redes sociales",
+        "poder_retencion_pct": 91,
+        "impacto_promedio": "Evita que los comercios usen links de pago de agregadores externos para sus ventas por internet"
+    },
+    {
+        "id": "PROD-PYME-EQUIPO",
+        "nombre": "Crédito Equipamiento & Transporte PyME",
+        "categoria": "Crédito a PyMEs",
+        "beneficio_clave": "Financiamiento de hasta $2.5M MXN a 36-48 meses con cuota fija para vehículos de reparto, maquinaria comercial y equipamiento",
+        "margen_banco_spread": "3.80% spread neto anual",
+        "elegibilidad": "Negocios y PyMEs con más de 12 meses de operación formal y facturación demostrable",
+        "poder_retencion_pct": 87,
+        "impacto_promedio": "Frena la migración de PyMEs consolidadas hacia arrendadoras externas o financieras automotrices"
+    }
 ]
 
-FINTECH_SYSTEM_INSTRUCTION = f"""Eres el Agente de Fintech & Banca del Google Cloud Summit México.
-Eres un asesor analítico y estratega de retención para la banca patrimonial, empresarial y de consumo (Head of Retention / Chief Risk Officer).
-Tu misión es analizar carteras de clientes con modelos de propensión de abandono (Churn Predictivo en BigQuery ML), identificar motivos de fuga de capitales y generar en tiempo real ofertas personalizadas de tipo Next-Best-Action (NBA) para retener los saldos de los clientes.
+SAMPLE_FINTECH_DATA = [
+    {
+        "id": "CLI-8821",
+        "nombre": "Bernardo Salcedo Valdés",
+        "negocio": "Restaurante Los Candiles",
+        "segmento": "Terminales de Pago",
+        "antiguedad_anios": 5,
+        "saldo_mxn": 450000,
+        "cltv_mxn": 380000,
+        "riesgo_abandono_pct": 74,
+        "ultimo_login": "Hace 15 días (Terminal guardada)",
+        "ultimo_movimiento": "Bajó su facturación con nosotros 60% por probar terminal portátil externa con menor tasa inicial",
+        "nps": "4/10 (Detractor)",
+        "causa_raiz": "Inconformidad con la comisión por transacción y cobro de renta mensual fija",
+        "producto_nba_id": "PROD-TPV-SMART",
+        "producto_nba_nombre": "Terminal Smart 4G Cero Renta + Comisión reducida al 1.75% por volumen",
+        "reduccion_riesgo_estimada": "74% -> 18%",
+        "capital_retenido_estimado": "$450,000 MXN facturados/mes"
+    },
+    {
+        "id": "CLI-9042",
+        "nombre": "Familia Navarro Benítez",
+        "negocio": "Mini-Súper El Progreso",
+        "segmento": "Crédito a PyMEs & TPV",
+        "antiguedad_anios": 8,
+        "saldo_mxn": 850000,
+        "cltv_mxn": 520000,
+        "riesgo_abandono_pct": 81,
+        "ultimo_login": "Ayer (Consulta de crédito en app)",
+        "ultimo_movimiento": "Solicitó crédito de $400k para inventario de temporada navideña; banco tradicional tarda 3 semanas",
+        "nps": "6/10 (Pasivo)",
+        "causa_raiz": "Urgencia de capital de trabajo rápido para surtir abarrotes antes de que se agote la mercancía",
+        "producto_nba_id": "PROD-CRED-PYME",
+        "producto_nba_nombre": "Crédito PyME Capital de Trabajo pre-aprobado por $400,000 MXN con depósito en 24h",
+        "reduccion_riesgo_estimada": "81% -> 20%",
+        "capital_retenido_estimado": "$850,000 MXN"
+    },
+    {
+        "id": "CLI-6619",
+        "nombre": "Fernando Zepeda Olvera",
+        "negocio": "Consultorio Dental Zepeda",
+        "segmento": "Terminales de Pago",
+        "antiguedad_anios": 3,
+        "saldo_mxn": 180000,
+        "cltv_mxn": 140000,
+        "riesgo_abandono_pct": 79,
+        "ultimo_login": "Hace 25 días (Sin cobros con tarjeta)",
+        "ultimo_movimiento": "Pide a sus pacientes pagar por transferencia SPEI para evitar renta mensual de la terminal",
+        "nps": "3/10 (Detractor)",
+        "causa_raiz": "Cobro de renta mensual fija de la terminal cuando tiene pocos cobros al mes",
+        "producto_nba_id": "PROD-TPV-SMART",
+        "producto_nba_nombre": "Migración a Terminal Portátil Bluetooth con Cero Renta Fija (solo pagas lo que cobras)",
+        "reduccion_riesgo_estimada": "79% -> 22%",
+        "capital_retenido_estimado": "$180,000 MXN facturados/mes"
+    },
+    {
+        "id": "CLI-5120",
+        "nombre": "Mariana Treviño Cárdenas",
+        "negocio": "Boutique & Calzado La Moda",
+        "segmento": "Terminales de Pago & Crédito PyME",
+        "antiguedad_anios": 4,
+        "saldo_mxn": 320000,
+        "cltv_mxn": 260000,
+        "riesgo_abandono_pct": 76,
+        "ultimo_login": "Hace 18 días (Cobros cayeron 45%)",
+        "ultimo_movimiento": "Empezó a cobrar con terminales portátiles y links de WhatsApp por falta de link digital integrado",
+        "nps": "4/10 (Detractor)",
+        "causa_raiz": "Falta de link de pago por WhatsApp y comisiones altas en ventas por redes sociales",
+        "producto_nba_id": "PROD-TPV-DIGITAL",
+        "producto_nba_nombre": "Cobro Digital & Link de Pago QR sin comisión adicional + Terminal Smart 4G",
+        "reduccion_riesgo_estimada": "76% -> 19%",
+        "capital_retenido_estimado": "$320,000 MXN facturados/mes"
+    },
+    {
+        "id": "CLI-4409",
+        "nombre": "Roberto Alcocer Mendoza",
+        "negocio": "Farmacia & Droguería El Carmen",
+        "segmento": "Terminales de Pago & PyMEs",
+        "antiguedad_anios": 6,
+        "saldo_mxn": 680000,
+        "cltv_mxn": 490000,
+        "riesgo_abandono_pct": 68,
+        "ultimo_login": "Ayer (Transaccional regular)",
+        "ultimo_movimiento": "Banco competidor le ofreció tasa de adquirencia del 1.65% y crédito de $500,000 para abrir sucursal",
+        "nps": "6/10 (Pasivo)",
+        "causa_raiz": "Competencia agresiva de bancos en comisión adquirente y crédito comercial",
+        "producto_nba_id": "PROD-TPV-TASA",
+        "producto_nba_nombre": "Tasa Preferencial por Volumen (1.60%) + Crédito PyME Express pre-autorizado",
+        "reduccion_riesgo_estimada": "68% -> 15%",
+        "capital_retenido_estimado": "$680,000 MXN facturados/mes"
+    },
+    {
+        "id": "CLI-7215",
+        "nombre": "Sofía Paredes Rangel",
+        "negocio": "Pastelería & Cafetería Dulce Miga",
+        "segmento": "Terminales de Pago",
+        "antiguedad_anios": 3,
+        "saldo_mxn": 210000,
+        "cltv_mxn": 175000,
+        "riesgo_abandono_pct": 82,
+        "ultimo_login": "Hace 22 días (Terminales desconectadas)",
+        "ultimo_movimiento": "Guardó 2 terminales nuestras tras fallas de conectividad Wi-Fi en horas pico y probó terminales de un agregador externo",
+        "nps": "3/10 (Detractor)",
+        "causa_raiz": "Fallas de señal en terminales viejas y cobro de renta mensual fija de $450 por equipo",
+        "producto_nba_id": "PROD-TPV-SMART",
+        "producto_nba_nombre": "Reemplazo express por 2 Terminales Smart con SIM 4G multicarrier y Cero Renta Fija",
+        "reduccion_riesgo_estimada": "82% -> 17%",
+        "capital_retenido_estimado": "$210,000 MXN facturados/mes"
+    },
+    {
+        "id": "CLI-3904",
+        "nombre": "Héctor Morales Galindo",
+        "negocio": "Ferretería & Materiales San Marcos",
+        "segmento": "Crédito a PyMEs",
+        "antiguedad_anios": 7,
+        "saldo_mxn": 1650000,
+        "cltv_mxn": 820000,
+        "riesgo_abandono_pct": 72,
+        "ultimo_login": "Hace 5 días",
+        "ultimo_movimiento": "Cotizó crédito automotriz con financiera externa para camioneta de reparto con enganche del 35%",
+        "nps": "5/10 (Detractor)",
+        "causa_raiz": "Necesidad de financiamiento para vehículo de carga ligera sin descapitalizar su inventario",
+        "producto_nba_id": "PROD-PYME-EQUIPO",
+        "producto_nba_nombre": "Crédito Equipamiento & Transporte PyME a 48 meses con tasa fija preferencial",
+        "reduccion_riesgo_estimada": "72% -> 18%",
+        "capital_retenido_estimado": "$1,650,000 MXN"
+    },
+    {
+        "id": "CLI-7703",
+        "nombre": "Guillermo Montemayor Lozano",
+        "negocio": "Taller & Refacciones San Juan",
+        "segmento": "Crédito a PyMEs",
+        "antiguedad_anios": 10,
+        "saldo_mxn": 1200000,
+        "cltv_mxn": 650000,
+        "riesgo_abandono_pct": 24,
+        "ultimo_login": "Hace 2 días",
+        "ultimo_movimiento": "Crédito actual de $1.2M al corriente con solo 3 cuotas restantes por pagar",
+        "nps": "8/10 (Promotor)",
+        "causa_raiz": "Riesgo de que un banco comercial le ofrezca un crédito nuevo antes que nosotros",
+        "producto_nba_id": "PROD-PYME-LINEA",
+        "producto_nba_nombre": "Línea de Crédito Revolvente PyME pre-autorizada a tasa preferencial sin comisión por apertura",
+        "reduccion_riesgo_estimada": "24% -> 5%",
+        "capital_retenido_estimado": "$1,200,000 MXN"
+    },
+    {
+        "id": "CLI-8310",
+        "nombre": "Valeria Santillán Vega",
+        "negocio": "Cliente Individual",
+        "segmento": "Crédito a Personas",
+        "antiguedad_anios": 4,
+        "saldo_mxn": 120000,
+        "cltv_mxn": 85000,
+        "riesgo_abandono_pct": 59,
+        "ultimo_login": "Hace 3 días",
+        "ultimo_movimiento": "Consultó trámite de cancelación de tarjeta tras ver cargo de anualidad en su estado de cuenta",
+        "nps": "5/10 (Detractor)",
+        "causa_raiz": "Cobro de anualidad y falta de recompensas comparado con nuevas tarjetas de crédito digitales",
+        "producto_nba_id": "PROD-CARD-CASHBACK",
+        "producto_nba_nombre": "Condonación de anualidad de por vida + Tarjeta con 2% de Cashback en compras",
+        "reduccion_riesgo_estimada": "59% -> 12%",
+        "capital_retenido_estimado": "$120,000 MXN"
+    }
+]
 
-CARTERA DE CLIENTES EN RIESGO (BigQuery ML):
+CDP_SEGMENTS_SUMMARY = [
+    {
+        "segmento": "Comercios con TPV Inactiva (Riesgo Fuga)",
+        "short_name": "TPV: Inactivas",
+        "linea_negocio": "Terminales de Pago",
+        "clientes": 1840,
+        "aum_total_mxn": 185000000,
+        "saldo_promedio": "$100.5k",
+        "tasa_abandono_pct": 8.9,
+        "campaña_digital": "Campaña Rescate TPV: Cero comisión los primeros $50k procesados + terminal Smart 4G sin costo",
+        "estatus": "🚨 TOP OFFENDER: Comercios que guardaron la terminal o migraron cobros a agregadores externos"
+    },
+    {
+        "segmento": "Tiendas y Abarrotes con TPV Activa",
+        "short_name": "TPV: Abarrotes",
+        "linea_negocio": "Terminales de Pago",
+        "clientes": 6420,
+        "aum_total_mxn": 290400000,
+        "saldo_promedio": "$45.2k",
+        "tasa_abandono_pct": 4.1,
+        "campaña_digital": "Campaña Tasa por Volumen: Reducción al 1.8% al superar $40,000/mes en cobros con tarjeta",
+        "estatus": "Alto volumen de cobros de importe bajo; fidelidad alta si la comisión es competitiva"
+    },
+    {
+        "segmento": "Restaurantes y Bares con TPV",
+        "short_name": "TPV: Restaurantes",
+        "linea_negocio": "Terminales de Pago",
+        "clientes": 3850,
+        "aum_total_mxn": 245800000,
+        "saldo_promedio": "$63.8k",
+        "tasa_abandono_pct": 5.3,
+        "campaña_digital": "Campaña Gastro-Pro: Terminal inalámbrica 4G sin renta mensual con propina electrónica directa",
+        "estatus": "Demandan cobro rápido en mesa, conexión estable y depósito de sus ventas al día siguiente"
+    },
+    {
+        "segmento": "Profesionales y Consultorios con TPV",
+        "short_name": "TPV: Consultorios",
+        "linea_negocio": "Terminales de Pago",
+        "clientes": 4680,
+        "aum_total_mxn": 142500000,
+        "saldo_promedio": "$30.4k",
+        "tasa_abandono_pct": 4.8,
+        "campaña_digital": "Campaña Salud & Servicios: Terminal portátil Bluetooth sin cobro de renta mensual fija",
+        "estatus": "Médicos, dentistas y profesionistas con cobros esporádicos; sensibles al cobro de renta mensual"
+    },
+    {
+        "segmento": "PyMEs: Crédito para Inventario",
+        "short_name": "PyMEs: Inventario",
+        "linea_negocio": "Crédito a PyMEs",
+        "clientes": 3920,
+        "aum_total_mxn": 310200000,
+        "saldo_promedio": "$79.1k",
+        "tasa_abandono_pct": 3.9,
+        "campaña_digital": "Campaña Temporada Alta: Préstamo express pre-aprobado para resurtido con abono semanal cómodo",
+        "estatus": "Negocios con excelente historial de pago puntual y demanda constante de capital de trabajo"
+    },
+    {
+        "segmento": "PyMEs en Riesgo por Ofertas de Bancos",
+        "short_name": "PyMEs: Fuga Bancos",
+        "linea_negocio": "Crédito a PyMEs",
+        "clientes": 1480,
+        "aum_total_mxn": 225600000,
+        "saldo_promedio": "$152.4k",
+        "tasa_abandono_pct": 8.3,
+        "campaña_digital": "Campaña Blindaje PyME: Renovación anticipada a tasa preferencial y sin comisión de apertura",
+        "estatus": "🚨 TOP OFFENDER: Empresas medianas tentadas por líneas de crédito de bancos comerciales tradicionales"
+    },
+    {
+        "segmento": "Talleres y Pequeñas Fábricas (Expansión)",
+        "short_name": "PyMEs: Expansión",
+        "linea_negocio": "Crédito a PyMEs",
+        "clientes": 2750,
+        "aum_total_mxn": 188400000,
+        "saldo_promedio": "$68.5k",
+        "tasa_abandono_pct": 4.4,
+        "campaña_digital": "Campaña Equipamiento: Financiamiento a 36 meses con 2 meses de gracia para maquinaria",
+        "estatus": "Necesidad de financiamiento a mediano plazo para comprar maquinaria o abrir sucursales"
+    },
+    {
+        "segmento": "Personas: Préstamos con Pago Puntual",
+        "short_name": "Personas: Buen Pago",
+        "linea_negocio": "Crédito a Personas",
+        "clientes": 14200,
+        "aum_total_mxn": 165000000,
+        "saldo_promedio": "$11.6k",
+        "tasa_abandono_pct": 3.5,
+        "campaña_digital": "Campaña Recompensa Puntual: Ampliación de préstamo pre-aprobado con menor tasa de interés",
+        "estatus": "Clientes con excelente récord de pago en sus cuotas; buscan renovar crédito para gastos familiares"
+    },
+    {
+        "segmento": "Personas: Tarjetas de Crédito Inactivas",
+        "short_name": "Tarjetas Inactivas",
+        "linea_negocio": "Crédito a Personas",
+        "clientes": 11800,
+        "aum_total_mxn": 118200000,
+        "saldo_promedio": "$10k",
+        "tasa_abandono_pct": 7.6,
+        "campaña_digital": "Campaña Reactivación: 10% de cashback en compras del súper + 3 meses sin intereses",
+        "estatus": "Tienen la tarjeta guardada en el cajón y usan tarjetas de crédito digitales sin comisiones"
+    },
+    {
+        "segmento": "Personas: En Riesgo por Compra de Deuda",
+        "short_name": "Personas: Fuga Deuda",
+        "linea_negocio": "Crédito a Personas",
+        "clientes": 5600,
+        "aum_total_mxn": 86500000,
+        "saldo_promedio": "$15.4k",
+        "tasa_abandono_pct": 8.1,
+        "campaña_digital": "Campaña Consolidación: Ajuste de cuota mensual y bonificación de la última mensualidad",
+        "estatus": "🚨 TOP OFFENDER: Clientes con ofertas de otros bancos para consolidar y transferir su deuda"
+    }
+]
+
+FINTECH_SYSTEM_INSTRUCTION = f"""Eres el Agente de Inteligencia Financiera & Retención del Google Cloud Summit México.
+Trabajas para una empresa de servicios financieros y tecnología comercial que ofrece tres soluciones principales:
+1. **Crédito a Personas:** Préstamos personales rápidos con pagos fijos y tarjetas de crédito con beneficios.
+2. **Crédito a PyMEs:** Préstamos para capital de trabajo, inventario, maquinaria y líneas de crédito revolventes para negocios.
+3. **Terminales de Pago (TPVs):** Maquinitas para cobro con tarjeta, pagos sin contacto y terminales inteligentes para tiendas, restaurantes y profesionistas.
+
+Tu misión es interactuar con el usuario en términos sencillos, directos y de negocios (sin tecnicismos complejos de banca de inversión):
+1. Explicar la distribución de cartera y las tasas de abandono en los 10 micro-segmentos tradicionales del Customer Data Platform (CDP 360°).
+2. Profundizar en los focos rojos principales de abandono:
+   - **Comercios con TPV Inactiva:** Maquinitas guardadas o migradas hacia agregadores externos (8.9% abandono).
+   - **PyMEs tentadas por bancos grandes:** Negocios con ofertas de crédito de la banca tradicional (8.3% abandono).
+   - **Personas con ofertas de compra de deuda:** Clientes de crédito personal a punto de migrar su deuda (8.1% abandono).
+3. Evaluar el comportamiento de clientes y comercios sintéticos (negocio, ventas procesadas, historial de pagos, causas de queja).
+4. Recomendar y activar ofertas personalizadas Next-Best-Action (NBA) del catálogo oficial de productos para frenar el abandono con un alto retorno de inversión (ROI).
+
+CATÁLOGO DE PRODUCTOS EN ALCANCE:
+{json.dumps(FINTECH_PRODUCT_CATALOG, indent=2, ensure_ascii=False)}
+
+MATRIZ DE 10 MICRO-SEGMENTOS CDP (CRÉDITO PERSONAS, PYMES Y TERMINALES DE PAGO):
+{json.dumps(CDP_SEGMENTS_SUMMARY, indent=2, ensure_ascii=False)}
+
+CARTERA DE CLIENTES Y COMERCIOS SINTÉTICOS (BigQuery ML):
 {json.dumps(SAMPLE_FINTECH_DATA, indent=2, ensure_ascii=False)}
 
-INSTRUCCIONES CLAVE:
-1. Responde dinámicamente y con detalle a cualquier pregunta sobre los clientes, tasas de interés, productos de inversión o estrategias de retención.
-2. Destaca a los clientes de mayor riesgo (como Empresa Aceros del Norte S.A. con 82% de riesgo y .85M MXN en saldo, o Roberto Garza Sada con 74% de riesgo y .42M MXN).
-3. Formula ofertas Next-Best-Action viables y atractivas (tasas de tesorería competitivas, asignación de banquero privado, notas estructuradas en USD).
-4. Presenta tus respuestas con formato ejecutivo en Markdown."""
+DIRECTRICES CLAVE:
+1. Habla de forma clara, natural y ejecutiva, usando cifras en millones de pesos ($M MXN), porcentajes de comisión y abonos mensuales.
+2. Cuando pregunten por un cliente o comercio (ej. Bernardo Salcedo de Restaurante Los Candiles, Familia Navarro de Mini-Súper El Progreso, Fernando Zepeda de Consultorio Dental, Mariana Treviño de Boutique La Moda, Héctor Morales de Ferretería San Marcos), analiza su situación real y explica por qué la oferta del catálogo (ej. Terminal Smart Cero Renta, Cobro Digital & Link QR, Crédito PyME Equipamiento) resuelve su problema.
+3. Destaca la sinergia comercial: quien tiene nuestra terminal de cobro puede obtener un crédito PyME automático para su negocio sin papeleo porque ya conocemos sus ventas diarias.
+4. Si el usuario pide activar una oferta o campaña, confirma el envío de la notificación al cliente/comercio en la app y la asignación al asesor comercial."""
 
 def extract_grounding_sources(candidate):
     sources = []
@@ -535,6 +902,10 @@ def chat_fintech(request: ChatRequest):
 @app.get("/api/fintech/chart")
 def get_fintech_chart_data():
     return SAMPLE_FINTECH_DATA
+
+@app.get("/api/fintech/catalog")
+def get_fintech_catalog():
+    return FINTECH_PRODUCT_CATALOG
 
 frontend_dir = os.path.join(os.path.dirname(__file__), "..", "frontend")
 
